@@ -16,6 +16,7 @@ Client::Client()
 
 void Client::connectToServer(QString serverIP, quint16 serverPort)
 {
+    //что будет, если пытаться установить соединение, которое уже установлено?
     m_serverIP = serverIP;
     m_serverPort = serverPort;
     QTimer *connectTimer = new QTimer(this);
@@ -24,15 +25,19 @@ void Client::connectToServer(QString serverIP, quint16 serverPort)
     connect(connectTimer, SIGNAL(timeout()), this, SLOT(tryToConnectOut()));
     connectTimer->start();
 
-
-    connect(m_tcpSocketOut, SIGNAL(connected()), this, SIGNAL(connectedOut());
+    //для разрыва связи с таймером
+    connect(m_tcpSocketOut, SIGNAL(connected()), this, SIGNAL(connectedOut()));
     connect(m_tcpSocketIn,  SIGNAL(connected()), this, SIGNAL(connectedIn()));
 
+    //для вызова connected для UI
+    connect(m_tcpSocketOut, SIGNAL(connected()), this, SLOT(emitConnect()));
+    connect(m_tcpSocketIn,  SIGNAL(connected()), this, SLOT(emitConnect()));
+
+    //для вызова disconnected для UI
     connect(m_tcpSocketOut, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
     connect(m_tcpSocketIn,  SIGNAL(disconnected()), this, SIGNAL(disconnected()));
 
     connect(this, SIGNAL(connected()), connectTimer, SLOT(stop()));
-
 }
 
 void Client::emitConnect()
@@ -110,15 +115,15 @@ void Client::sendMessage(QString message)
 void Client::readMessage()
 {
     quint16 blockSize;
-    QDataStream in(m_tcpSocketOut);
+    QDataStream in(m_tcpSocketIn);
     in.setVersion(QDataStream::Qt_4_0);
 
-    if (m_tcpSocketOut->bytesAvailable() < (int)sizeof(quint16)) {
+    if (m_tcpSocketIn->bytesAvailable() < (int)sizeof(quint16)) {
         return;
     }
     in >> blockSize;
 
-    if (m_tcpSocketOut->bytesAvailable() < blockSize) {
+    if (m_tcpSocketIn->bytesAvailable() < blockSize) {
         return;
     }
 

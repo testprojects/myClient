@@ -25,6 +25,8 @@ public slots:
     //читаем сообщение от сервера
     void readMessage();
     //подключены ли мы к серверу (не всегда правда)
+    bool isConnectedOut() const;
+    bool isConnectedIn() const;
     bool isConnected() const;
     //пытаемся присоединиться к серверу через установленный интервал времени
     void connectToServer(QString serverIP, quint16 serverPort);
@@ -43,7 +45,8 @@ signals:
 
 private slots:
     //слот, который пытается подключиться через интервалы времени
-    void tryToConnect();
+    void tryToConnectOut();
+    void tryToConnectIn();
     void dispatchServerMessage();
     void emitConnect();
     void emitDisconnect();
