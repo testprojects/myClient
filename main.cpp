@@ -1,12 +1,11 @@
-#include <QCoreApplication>
+#include <QApplication>
 #include <QTimer>
-#include "client.h"
-#include "ui.h"
+#include "form.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-    UI *ui = new UI(&a);
-    ui->showMainMenu();
+    QApplication a(argc, argv);
+    Form form;
+    form.show();
     return a.exec();
 }

@@ -4,21 +4,23 @@
 #
 #-------------------------------------------------
 
-QT       += core network
-
-QT       -= gui
+QT       += network gui widgets
 
 TARGET = myClient
-CONFIG   += console
-CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+#CONFIG -= console
 
 SOURCES += main.cpp \
     client.cpp \
-    ui.cpp
+#    ui.cpp \
+    form.cpp
 
 HEADERS += \
     client.h \
-    ui.h
+#    ui.h \
+    form.h
+
+FORMS += \
+    form.ui

@@ -1,30 +1,28 @@
 #include "client.h"
 #include <QtNetwork>
-#include <QDebug>
+//#include <QDebug>
 #include <iostream>
 
 const int CONNECTION_INTERVAL = 1000;
 
-Client::Client()
+Client::Client(QString serverIP, quint16 serverPort, QObject *parent):
+    m_serverIP(serverIP), m_serverPort(serverPort), QObject(parent)
 {
-    m_tcpSocket = new QTcpSocket;
-    //убираем задержку перед отсоединением сокета, если есть проблемы с серваком
-    m_tcpSocket->setSocketOption(QAbstractSocket::KeepAliveOption, 0);
-}
-
-void Client::connectToServer(QString serverIP, quint16 serverPort)
-{
-    //что будет, если пытаться установить соединение, которое уже установлено?
-    m_serverIP = serverIP;
-    m_serverPort = serverPort;
-    QTimer *connectTimer = new QTimer(this);
-    connectTimer->setInterval(CONNECTION_INTERVAL);
-
-    connect(connectTimer, SIGNAL(timeout()), this, SLOT(tryToConnect()));
-    connect(m_tcpSocket, SIGNAL(connected()), connectTimer, SLOT(stop()));
+    m_tcpSocket = new QTcpSocket(this);
+    connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(readMessage()));
     connect(m_tcpSocket, SIGNAL(connected()), this, SIGNAL(connected()));
     connect(m_tcpSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+    //убираем задержку перед отсоединением сокета, если есть проблемы с серваком
+//    m_tcpSocket->setSocketOption(QAbstractSocket::KeepAliveOption, 0);
+}
 
+void Client::connectToServer()
+{
+    //что будет, если пытаться установить соединение, которое уже установлено?
+    QTimer *connectTimer = new QTimer(this);
+    connectTimer->setInterval(CONNECTION_INTERVAL);
+    connect(connectTimer, SIGNAL(timeout()), this, SLOT(tryToConnect()));
+    connect(m_tcpSocket, SIGNAL(connected()), connectTimer, SLOT(stop()));
     connectTimer->start();
 }
 
@@ -65,22 +63,22 @@ void Client::sendMessage(QString message)
     m_tcpSocket->flush();
 }
 
-//void Client::readMessage()
-//{
-//    quint16 blockSize;
-//    QDataStream in(m_tcpSocketIn);
-//    in.setVersion(QDataStream::Qt_4_0);
+void Client::readMessage()
+{
+    quint16 blockSize;
+    QDataStream in(m_tcpSocket);
+    in.setVersion(QDataStream::Qt_4_0);
 
-//    if (m_tcpSocketIn->bytesAvailable() < (int)sizeof(quint16)) {
-//        return;
-//    }
-//    in >> blockSize;
+    if (m_tcpSocket->bytesAvailable() < (int)sizeof(quint16)) {
+        return;
+    }
+    in >> blockSize;
 
-//    if (m_tcpSocketIn->bytesAvailable() < blockSize) {
-//        return;
-//    }
+    if (m_tcpSocket->bytesAvailable() < blockSize) {
+        return;
+    }
 
-//    in >> m_serverMessage;
-//    m_serverMessage.remove('\"');
-//    dispatchServerMessage();
-//}
+    in >> m_serverMessage;
+//    qDebug() << "Message readed: " << m_serverMessage;
+    emit messageRecieved(m_serverMessage);
+}

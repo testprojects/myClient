@@ -16,6 +16,7 @@ public slots:
 
 private slots:
     void connectToServer(QString serverIP, quint16 serverPort);
+    void printServerMessage();
     void disconnectFromServer();
 
 private:

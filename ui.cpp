@@ -12,14 +12,20 @@ UI::UI(QObject *parent) : QObject(parent), m_client(0)
 
 void UI::connectToServer(QString serverIP, quint16 serverPort)
 {
-    m_client = new Client;
+//    m_client = new Client(this);
     connect(m_client, SIGNAL(connected()), this, SLOT(showSubMenu()));
-    m_client->connectToServer(serverIP, serverPort);
+    connect(m_client, SIGNAL(messageRecieved()), this, SLOT(printServerMessage()));
+//    m_client->connectToServer(serverIP, serverPort);
 }
 
 void UI::disconnectFromServer()
 {
     m_client->disconnectFromServer();
+}
+
+void UI::printServerMessage()
+{
+    std::cout << "Server message: " << m_client->m_serverMessage.toStdString();
 }
 
 void UI::showMainMenu(QString error)
