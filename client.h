@@ -23,10 +23,9 @@ public slots:
     //отсылаем сообщение серверу
     void sendMessage(QString message);
     //читаем сообщение от сервера
-    void readMessage();
+//    void readMessage();
     //подключены ли мы к серверу (не всегда правда)
-    bool isConnectedOut() const;
-    bool isConnectedIn() const;
+
     bool isConnected() const;
     //пытаемся присоединиться к серверу через установленный интервал времени
     void connectToServer(QString serverIP, quint16 serverPort);
@@ -38,24 +37,13 @@ signals:
     void connected();
     void disconnected();
 
-    void connectedOut();
-    void connectedIn();
-    void disconnectedOut();
-    void disconnectedIn();
-
 private slots:
     //слот, который пытается подключиться через интервалы времени
-    void tryToConnectOut();
-    void tryToConnectIn();
-    void dispatchServerMessage();
-    void emitConnect();
-    void emitDisconnect();
+    void tryToConnect();
 
 private:
     //сокет на запись
-    QTcpSocket *m_tcpSocketOut;
-    //сокет на чтение
-    QTcpSocket *m_tcpSocketIn;
+    QTcpSocket *m_tcpSocket;
 
     QString m_serverIP;
     quint16 m_serverPort;

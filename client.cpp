@@ -7,11 +7,9 @@ const int CONNECTION_INTERVAL = 1000;
 
 Client::Client()
 {
-    m_tcpSocketOut = new QTcpSocket;
-    m_tcpSocketIn =  new QTcpSocket;
+    m_tcpSocket = new QTcpSocket;
     //убираем задержку перед отсоединением сокета, если есть проблемы с серваком
-    m_tcpSocketOut->setSocketOption(QAbstractSocket::KeepAliveOption, 0);
-    m_tcpSocketIn->setSocketOption(QAbstractSocket::KeepAliveOption, 0);
+    m_tcpSocket->setSocketOption(QAbstractSocket::KeepAliveOption, 0);
 }
 
 void Client::connectToServer(QString serverIP, quint16 serverPort)
@@ -21,81 +19,36 @@ void Client::connectToServer(QString serverIP, quint16 serverPort)
     m_serverPort = serverPort;
     QTimer *connectTimer = new QTimer(this);
     connectTimer->setInterval(CONNECTION_INTERVAL);
-    connect(connectTimer, SIGNAL(timeout()), this, SLOT(tryToConnectIn()));
-    connect(connectTimer, SIGNAL(timeout()), this, SLOT(tryToConnectOut()));
+
+    connect(connectTimer, SIGNAL(timeout()), this, SLOT(tryToConnect()));
+    connect(m_tcpSocket, SIGNAL(connected()), connectTimer, SLOT(stop()));
+    connect(m_tcpSocket, SIGNAL(connected()), this, SIGNAL(connected()));
+    connect(m_tcpSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+
     connectTimer->start();
-
-    //для разрыва связи с таймером
-    connect(m_tcpSocketOut, SIGNAL(connected()), this, SIGNAL(connectedOut()));
-    connect(m_tcpSocketIn,  SIGNAL(connected()), this, SIGNAL(connectedIn()));
-
-    //для вызова connected для UI
-    connect(m_tcpSocketOut, SIGNAL(connected()), this, SLOT(emitConnect()));
-    connect(m_tcpSocketIn,  SIGNAL(connected()), this, SLOT(emitConnect()));
-
-    //для вызова disconnected для UI
-    connect(m_tcpSocketOut, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
-    connect(m_tcpSocketIn,  SIGNAL(disconnected()), this, SIGNAL(disconnected()));
-
-    connect(this, SIGNAL(connected()), connectTimer, SLOT(stop()));
-}
-
-void Client::emitConnect()
-{
-    //если оба сокета подключены, клиент подключен полностью
-    if(isConnected()) {
-        emit connected();
-    }
-}
-
-void Client::emitDisconnect()
-{
-    emit disconnected();
 }
 
 void Client::disconnectFromServer()
 {
-    m_tcpSocketOut->disconnectFromHost();
-    m_tcpSocketIn->disconnectFromHost();
+    m_tcpSocket->disconnectFromHost();
 }
 
-void Client::tryToConnectOut()
+void Client::tryToConnect()
 {
-    if(!isConnectedOut())
-        m_tcpSocketOut->connectToHost(QHostAddress(m_serverIP), m_serverPort);
-}
-
-void Client::tryToConnectIn()
-{
-    if(!isConnectedIn())
-        m_tcpSocketIn->connectToHost(QHostAddress(m_serverIP), m_serverPort);
+    m_tcpSocket->connectToHost(QHostAddress(m_serverIP), m_serverPort);
 }
 
 bool Client::isConnected() const
 {
-    if(isConnectedIn() && isConnectedOut())
-        return true;
-    return false;
-}
-
-bool Client::isConnectedOut() const
-{
-    if(m_tcpSocketOut->state() == QTcpSocket::ConnectedState)
-        return true;
-    return false;
-}
-
-bool Client::isConnectedIn() const
-{
-    if(m_tcpSocketIn->state() == QTcpSocket::ConnectedState)
+    if(m_tcpSocket->state() == QAbstractSocket::ConnectedState)
         return true;
     return false;
 }
 
 Client::~Client()
 {
-    m_tcpSocketOut->disconnectFromHost();
-    connect(m_tcpSocketOut, SIGNAL(disconnected()), SLOT(deleteLater()));
+    m_tcpSocket->disconnectFromHost();
+    connect(m_tcpSocket, SIGNAL(disconnected()), SLOT(deleteLater()));
 }
 
 void Client::sendMessage(QString message)
@@ -108,33 +61,26 @@ void Client::sendMessage(QString message)
     out.device()->seek(0);
     out << (quint16)(block.size() - sizeof(quint16));
 
-    m_tcpSocketOut->write(block);
-    m_tcpSocketOut->flush();
+    m_tcpSocket->write(block);
+    m_tcpSocket->flush();
 }
 
-void Client::readMessage()
-{
-    quint16 blockSize;
-    QDataStream in(m_tcpSocketIn);
-    in.setVersion(QDataStream::Qt_4_0);
+//void Client::readMessage()
+//{
+//    quint16 blockSize;
+//    QDataStream in(m_tcpSocketIn);
+//    in.setVersion(QDataStream::Qt_4_0);
 
-    if (m_tcpSocketIn->bytesAvailable() < (int)sizeof(quint16)) {
-        return;
-    }
-    in >> blockSize;
+//    if (m_tcpSocketIn->bytesAvailable() < (int)sizeof(quint16)) {
+//        return;
+//    }
+//    in >> blockSize;
 
-    if (m_tcpSocketIn->bytesAvailable() < blockSize) {
-        return;
-    }
+//    if (m_tcpSocketIn->bytesAvailable() < blockSize) {
+//        return;
+//    }
 
-    in >> m_serverMessage;
-    m_serverMessage.remove('\"');
-    dispatchServerMessage();
-}
-
-void Client::dispatchServerMessage()
-{
-    //в зависимости от того, какое сообщение принято от сервера
-    //вызываем то или иное меню
-    //сервер будет ждать указания, какую команду обработать
-}
+//    in >> m_serverMessage;
+//    m_serverMessage.remove('\"');
+//    dispatchServerMessage();
+//}
