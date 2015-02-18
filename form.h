@@ -25,6 +25,11 @@ private slots:
 
     void on_pushButtonSendRequest_clicked();
 
+
+    void on_pushButtonLoadRequestDikon_clicked();
+
+    void on_pushButtonLoadRequestZhenya_clicked();
+
 private:
     Ui::Form *ui;
     Client *m_client;

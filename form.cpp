@@ -62,3 +62,17 @@ void Form::displayMessage(QString message)
 {
     QMessageBox::information(this, "Information", message);
 }
+
+void Form::on_pushButtonLoadRequestDikon_clicked()
+{
+    QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Дикон)", QDir::home().path(), "Text *.txt");
+    if(!filePath.isEmpty())
+        m_client->sendMessage(QString("LOAD_REQUEST(%1)").arg(filePath));
+}
+
+void Form::on_pushButtonLoadRequestZhenya_clicked()
+{
+    QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Женя)", QDir::home().path(), "*.fps");
+    if(!filePath.isEmpty())
+        m_client->sendMessage(QString("LOAD_REQUEST(%1)").arg(filePath));
+}

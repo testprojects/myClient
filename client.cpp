@@ -1,12 +1,10 @@
 #include "client.h"
 #include <QtNetwork>
-//#include <QDebug>
-#include <iostream>
 
 const int CONNECTION_INTERVAL = 1000;
 
 Client::Client(QString serverIP, quint16 serverPort, QObject *parent):
-    m_serverIP(serverIP), m_serverPort(serverPort), QObject(parent)
+    QObject(parent), m_serverIP(serverIP), m_serverPort(serverPort)
 {
     m_tcpSocket = new QTcpSocket(this);
     connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(readMessage()));
