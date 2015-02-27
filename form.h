@@ -2,8 +2,7 @@
 #define FORM_H
 
 #include <QWidget>
-class Client;
-class QMenu;
+#include "client.h"
 
 namespace Ui {
 class Form;
@@ -18,16 +17,14 @@ public:
     ~Form();
 
 private slots:
-    void displayMessage(QString message);
+    void displayPacket(Packet &pack);
+    void displayString(QString str);
     void on_pushButtonConnect_clicked();
     void onConnected();
     void onDisconnected();
 
     void on_pushButtonSendRequest_clicked();
-
-
     void on_pushButtonLoadRequestDikon_clicked();
-
     void on_pushButtonLoadRequestZhenya_clicked();
 
 private:

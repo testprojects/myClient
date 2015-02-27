@@ -1,14 +1,9 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 #include <QObject>
+#include <QStringList>
+#include "packet.h"
 class QTcpSocket;
-
-enum Commands {PLAN_SUZ = 1, PLAN_BUZ, CHANGE_TO, CACHE_OUT, LOAD_REQUEST_DIKON, LOAD_REQUEST_ZHENYA};
-struct Package {
-    int len;            //размер структуры
-    Commands command;   //команда на выполнение
-    QStringList params; //параметры команды
-};
 
 class Client : public QObject
 {
@@ -19,9 +14,9 @@ public:
 
 public slots:
     //отсылаем сообщение серверу
-    void sendMessage(QString message);
+    void sendMessage(const QString &message);
     //читаем сообщение от сервера
-    void readMessage();
+    void readPacket();
     //подключены ли мы к серверу (не всегда правда)
 
     bool isConnected() const;
@@ -34,8 +29,7 @@ signals:
     //сигналы от сокета переадресовываем классу интерфейса
     void connected();
     void disconnected();
-    void messageRecieved(QString);
-
+    void stringRecieved(QString);
 private slots:
     //слот, который пытается подключиться через интервалы времени
     void tryToConnect();

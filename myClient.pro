@@ -5,22 +5,39 @@
 #-------------------------------------------------
 
 QT       += network gui widgets
-
+INCLUDEPATH += /Users/artem/projects/plan/
 TARGET = myClient
-
 TEMPLATE = app
-
-#CONFIG -= console
 
 SOURCES += main.cpp \
     client.cpp \
-#    ui.cpp \
-    form.cpp
+    form.cpp \
+    packet.cpp \
+    widgetplanstream.cpp
+#    ../plan/echelon.cpp \
+#    ../plan/mytime.cpp \
+#    ../plan/ps.cpp \
+#    ../plan/pvr.cpp \
+#    ../plan/request.cpp \
+#    ../plan/section.cpp \
+#    ../plan/station.cpp \
+#    ../plan/stream.cpp
 
 HEADERS += \
     client.h \
-#    ui.h \
-    form.h
+    form.h \
+    packet.h \
+    types.h \
+    ../plan/echelon.h \
+    ../plan/mytime.h \
+    ../plan/ps.h \
+    ../plan/pvr.h \
+    ../plan/request.h \
+    ../plan/section.h \
+    ../plan/station.h \
+    ../plan/stream.h \
+    widgetplanstream.h
 
 FORMS += \
-    form.ui
+    form.ui \
+    widgetplanstream.ui

@@ -29,14 +29,14 @@
   <widget class="QPushButton" name="pushButtonSendRequest">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>50</y>
-     <width>114</width>
+     <x>150</x>
+     <y>70</y>
+     <width>241</width>
      <height>32</height>
     </rect>
    </property>
    <property name="text">
-    <string>Send request</string>
+    <string>Спланировать поток (СУЗ)</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButtonLoadRequestDikon">

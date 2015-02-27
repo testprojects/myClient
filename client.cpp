@@ -1,5 +1,7 @@
 #include "client.h"
 #include <QtNetwork>
+#include "packet.h"
+#include "station.h"
 
 const int CONNECTION_INTERVAL = 1000;
 
@@ -7,7 +9,7 @@ Client::Client(QString serverIP, quint16 serverPort, QObject *parent):
     QObject(parent), m_serverIP(serverIP), m_serverPort(serverPort)
 {
     m_tcpSocket = new QTcpSocket(this);
-    connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(readMessage()));
+    connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(readPacket()));
     connect(m_tcpSocket, SIGNAL(connected()), this, SIGNAL(connected()));
     connect(m_tcpSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
     //убираем задержку перед отсоединением сокета, если есть проблемы с серваком
@@ -47,7 +49,7 @@ Client::~Client()
     connect(m_tcpSocket, SIGNAL(disconnected()), SLOT(deleteLater()));
 }
 
-void Client::sendMessage(QString message)
+void Client::sendMessage(const QString &message)
 {
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -61,7 +63,7 @@ void Client::sendMessage(QString message)
     m_tcpSocket->flush();
 }
 
-void Client::readMessage()
+void Client::readPacket()
 {
     quint16 blockSize;
     QDataStream in(m_tcpSocket);
@@ -76,7 +78,24 @@ void Client::readMessage()
         return;
     }
 
-    in >> m_serverMessage;
-//    qDebug() << "Message readed: " << m_serverMessage;
-    emit messageRecieved(m_serverMessage);
+
+    Type type;
+    in >> (quint8&)type;
+    switch(type) {
+    case TYPE_QSTRING:
+    {
+        Packet pack(m_tcpSocket->readAll(), TYPE_QSTRING);
+        QString str = pack.decodeToQString();
+        emit stringRecieved(str);
+        break;
+    }
+    case TYPE_STATION:
+    {
+        Packet pack(m_tcpSocket->readAll(), TYPE_STATION);
+        Station st = pack.decodeToStation();
+        QString strStation = st.name + QString(" (%1)").arg(st.number);
+        emit stringRecieved(strStation);
+        break;
+    }
+    }
 }
