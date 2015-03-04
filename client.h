@@ -33,16 +33,20 @@ signals:
 private slots:
     //слот, который пытается подключиться через интервалы времени
     void tryToConnect();
+    void dispatchMessage(const QString &message);
+
+signals:
+    void signalPlanStarted();
+    void signalPlanned(int count, int amount);
+    void signalStreamsFailed(int count);
+    void signalPlanFinished();
 
 private:
     //сокет на запись
     QTcpSocket *m_tcpSocket;
-
 public:
     QString m_serverIP;
     quint16 m_serverPort;
-public:
-    QString m_serverMessage;
 };
 
 #endif // CLIENT_H

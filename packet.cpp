@@ -18,6 +18,7 @@ Packet::Packet(const QString &str):
     QDataStream out(&m_ba, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_0);
     out << str;
+    qDebug() << "message about to transmitt: " << str;
 }
 
 Packet::Packet(const Station &st):

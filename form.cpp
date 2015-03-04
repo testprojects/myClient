@@ -8,6 +8,7 @@
 
 const QString SERVER_IP = "127.0.0.1";
 const quint16 SERVER_PORT = 1535;
+const int STRETCH = 1;
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
@@ -21,7 +22,12 @@ Form::Form(QWidget *parent) :
     m_client = new Client(SERVER_IP, SERVER_PORT, this);
     connect(m_client, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(m_client, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-    connect(m_client, SIGNAL(stringRecieved(QString)), this, SLOT(displayString(QString)));
+    connect(m_client, SIGNAL(stringRecieved(QString)), this, SLOT(displayMessage(QString)));
+
+    connect(m_client, SIGNAL(signalPlanStarted()), this, SLOT(slotPlanStarted()));
+    connect(m_client, SIGNAL(signalPlanned(int,int)), this, SLOT(slotStreamPlanned(int,int)));
+    connect(m_client, SIGNAL(signalStreamsFailed(int)), this, SLOT(slotStreamsFailed(int)));
+    connect(m_client, SIGNAL(signalPlanFinished()), this, SLOT(slotPlanFinished()));
 }
 
 Form::~Form()
@@ -88,18 +94,9 @@ void Form::on_pushButtonSendRequest_clicked()
     }
 }
 
-void Form::displayPacket(Packet& pack)
+void Form::displayMessage(const QString &message)
 {
-//    QString message = QString("command:%1 params:%2")
-//            .arg(pack.command)
-//            .arg(pack.params.join(','));
-//    QMessageBox::information(this, "Information", message);
-}
-
-void Form::displayString(QString str)
-{
-    QString examp = "WTF";
-    QMessageBox::information(this, "String recieved", str);
+    qDebug() << "String recieved" << message;
 }
 
 void Form::on_pushButtonLoadRequestDikon_clicked()
@@ -119,4 +116,43 @@ void Form::on_pushButtonLoadRequestZhenya_clicked()
         QString strCommand = QString("LOAD_STREAM(%1)").arg(filePath);
         m_client->sendMessage(strCommand);
     }
+}
+
+void Form::slotPlanStarted()
+{
+    m_layoutProgress = new QVBoxLayout(this);
+
+    m_progressBar = new QProgressBar(this);
+    m_progressBar->resize(width(), m_progressBar->height() * 2);
+    m_progressBar->setRange(0, 1000);
+
+    m_labelStreamsPlanned = new QLabel(this);
+    m_labelStreamsPlanned->setText("COUNT / TOTAL");
+
+    m_layoutProgress->addWidget(m_progressBar, STRETCH, Qt::AlignCenter|Qt::AlignBottom);
+    m_layoutProgress->addWidget(m_labelStreamsPlanned, STRETCH, Qt::AlignCenter|Qt::AlignBottom);
+    setLayout(m_layoutProgress);
+}
+
+void Form::slotStreamPlanned(int count, int amount)
+{
+    if(m_progressBar) {
+        double val = (double)count / (double)amount * 1000.0;
+        m_progressBar->setValue((int)val);
+        m_labelStreamsPlanned->setText(QString("%1/%2").arg(count).arg(amount));
+    }
+}
+
+void Form::slotStreamsFailed(int count)
+{
+    QMessageBox::warning(this, "Не спланированные потоки", QString("Количество: %1").arg(count));
+}
+
+void Form::slotPlanFinished()
+{
+    QMessageBox::information(this, "Планирование завершено", "Планирование завершено");
+    if(m_progressBar)
+        delete m_progressBar;
+    if(m_labelStreamsPlanned)
+        delete m_labelStreamsPlanned;
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>780</width>
+    <height>373</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="pushButtonConnect">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>10</y>
+     <x>380</x>
+     <y>20</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="pushButtonSendRequest">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>70</y>
+     <x>250</x>
+     <y>80</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -42,8 +42,8 @@
   <widget class="QPushButton" name="pushButtonLoadRequestDikon">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>90</y>
+     <x>250</x>
+     <y>100</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -55,8 +55,8 @@
   <widget class="QPushButton" name="pushButtonLoadRequestZhenya">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>110</y>
+     <x>250</x>
+     <y>120</y>
      <width>241</width>
      <height>32</height>
     </rect>
