@@ -9,6 +9,8 @@ struct Section;
 struct PVR;
 class Request;
 class Stream;
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
 //данные о размере пакета и о типе хранимого объекта ДОЛЖНЫ считываться вне класса
 
@@ -24,6 +26,8 @@ public:
     Packet(const PVR &pvr);
     Packet(const Request &req);
     Packet(const Stream &stream);
+    Packet(const QXmlStreamWriter &xml);
+    Packet(const QXmlStreamReader &xml);
     Type type() const {return m_type;}
 
 public:

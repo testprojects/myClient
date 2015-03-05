@@ -29,7 +29,7 @@
   <widget class="QPushButton" name="pushButtonSendRequest">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>70</x>
      <y>80</y>
      <width>241</width>
      <height>32</height>
@@ -42,7 +42,7 @@
   <widget class="QPushButton" name="pushButtonLoadRequestDikon">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>70</x>
      <y>100</y>
      <width>241</width>
      <height>32</height>
@@ -55,7 +55,7 @@
   <widget class="QPushButton" name="pushButtonLoadRequestZhenya">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>70</x>
      <y>120</y>
      <width>241</width>
      <height>32</height>
@@ -63,6 +63,29 @@
    </property>
    <property name="text">
     <string>Загрузить заявку с ПК (Женя)</string>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="textBrowser">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>110</y>
+     <width>256</width>
+     <height>192</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonGetXML">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>80</y>
+     <width>114</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>getXML</string>
    </property>
   </widget>
  </widget>

@@ -3,6 +3,7 @@
 #include "client.h"
 #include "packet.h"
 #include "widgetplanstream.h"
+#include "dialogstreamoffset.h"
 
 #include <QtWidgets>
 
@@ -28,6 +29,8 @@ Form::Form(QWidget *parent) :
     connect(m_client, SIGNAL(signalPlanned(int,int)), this, SLOT(slotStreamPlanned(int,int)));
     connect(m_client, SIGNAL(signalStreamsFailed(int)), this, SLOT(slotStreamsFailed(int)));
     connect(m_client, SIGNAL(signalPlanFinished()), this, SLOT(slotPlanFinished()));
+    connect(m_client, SIGNAL(signalOffsetStream(int, int, int, int)), this, SLOT(slotOffsetStream(int, int, int, int)));
+    connect(m_client, SIGNAL(signalXMLReady(QByteArray&)), this, SLOT(slotXMLReady(QByteArray&)));
 }
 
 Form::~Form()
@@ -96,7 +99,6 @@ void Form::on_pushButtonSendRequest_clicked()
 
 void Form::displayMessage(const QString &message)
 {
-    qDebug() << "String recieved" << message;
 }
 
 void Form::on_pushButtonLoadRequestDikon_clicked()
@@ -123,7 +125,7 @@ void Form::slotPlanStarted()
     m_layoutProgress = new QVBoxLayout(this);
 
     m_progressBar = new QProgressBar(this);
-    m_progressBar->resize(width(), m_progressBar->height() * 2);
+    m_progressBar->setFixedWidth(width());
     m_progressBar->setRange(0, 1000);
 
     m_labelStreamsPlanned = new QLabel(this);
@@ -131,7 +133,6 @@ void Form::slotPlanStarted()
 
     m_layoutProgress->addWidget(m_progressBar, STRETCH, Qt::AlignCenter|Qt::AlignBottom);
     m_layoutProgress->addWidget(m_labelStreamsPlanned, STRETCH, Qt::AlignCenter|Qt::AlignBottom);
-    setLayout(m_layoutProgress);
 }
 
 void Form::slotStreamPlanned(int count, int amount)
@@ -155,4 +156,25 @@ void Form::slotPlanFinished()
         delete m_progressBar;
     if(m_labelStreamsPlanned)
         delete m_labelStreamsPlanned;
+}
+
+void Form::slotOffsetStream(int VP, int KP, int NP, int hours)
+{
+    DialogStreamOffset dialog(VP, KP, NP, hours, this);
+    int ok = dialog.exec();
+    bool b_Accept = (bool)ok;
+    QString message = QString("%1,%2")
+            .arg(ACCEPT_OFFSET)
+            .arg(b_Accept);
+    m_client->sendMessage(message);
+}
+
+void Form::on_pushButtonGetXML_clicked()
+{
+    m_client->sendMessage(QString("%1").arg(GET_XML));
+}
+
+void Form::slotXMLReady(QByteArray &ba)
+{
+    ui->textBrowser->append(ba);
 }

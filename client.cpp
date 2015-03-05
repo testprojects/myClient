@@ -61,6 +61,7 @@ void Client::sendMessage(const QString &message)
 
     m_tcpSocket->write(block);
     m_tcpSocket->flush();
+    qDebug() << "Sended message: " << message;
 }
 
 void Client::readPacket()
@@ -99,6 +100,11 @@ void Client::readPacket()
             emit stringRecieved(strStation);
             break;
         }
+        case TYPE_QXML_STREAM:
+        {
+            emit signalXMLReady(block);
+            break;
+        }
         default:
         {
             assert(0);
@@ -107,22 +113,37 @@ void Client::readPacket()
     }
 }
 
-void Client::dispatchMessage(const QString &message)
+void Client::dispatchMessage(QString message)
 {
     qDebug() << "Despatching message: " << message;
     if(message.startsWith("PLAN_STARTED")) {
         emit signalPlanStarted();
     }
     else if(message.startsWith("STREAM_PLANNED")) {
-        int count = message.mid(message.indexOf('(') + 1, message.indexOf('/') - message.indexOf('(') - 1).toInt();
-        int amount = message.mid(message.indexOf('/') + 1, message.indexOf(')') - message.indexOf('/') - 1).toInt();
+        message.remove(0, QString::fromUtf8("STREAM_PLANNED(").length());
+        message.chop(1);
+        QStringList list = message.split('/');
+        int count = list[0].toInt();
+        int amount = list[1].toInt();
         emit signalPlanned(count, amount);
     }
     else if(message.startsWith("FAILED_STREAMS")) {
-        int count = message.mid(message.indexOf('(') + 1, message.indexOf(')') - message.indexOf('(')).toInt();
+        message.remove(0, QString::fromUtf8("FAILED_STREAMS(").length());
+        message.chop(1);
+        int count = message.toInt();
         emit signalStreamsFailed(count);
     }
     else if(message.startsWith("PLAN_FINISHED")) {
         emit signalPlanFinished();
+    }
+    else if(message.startsWith("OFFSET_STREAM")) {
+        message.remove(0, QString::fromUtf8("OFFSET_STREAM(").length());
+        message.chop(1);
+        QStringList list = message.split(',');
+        int VP = list[0].toInt();
+        int KP = list[1].toInt();
+        int NP = list[2].toInt();
+        int hours = list[3].toInt();
+        emit signalOffsetStream(VP, KP, NP, hours);
     }
 }

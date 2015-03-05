@@ -33,13 +33,15 @@ signals:
 private slots:
     //слот, который пытается подключиться через интервалы времени
     void tryToConnect();
-    void dispatchMessage(const QString &message);
+    void dispatchMessage(QString message);
 
 signals:
     void signalPlanStarted();
     void signalPlanned(int count, int amount);
     void signalStreamsFailed(int count);
     void signalPlanFinished();
+    void signalOffsetStream(int VP, int KP, int NP, int hours);
+    void signalXMLReady(QByteArray &ba);
 
 private:
     //сокет на запись

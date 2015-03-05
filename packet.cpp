@@ -6,6 +6,8 @@
 #include "pvr.h"
 #include "stream.h"
 #include <QDebug>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 QByteArray Packet::toByteArray() const
 {
@@ -43,7 +45,7 @@ Packet::Packet(QByteArray ba, const Type &t):
 {
     m_ba = ba;
     if((m_type != TYPE_NOT_DEFINED)&&(m_type != TYPE_QSTRING)&&(m_type != TYPE_STATION) && (m_type != TYPE_SECTION) &&
-            (m_type != TYPE_PVR) && (m_type != TYPE_REQUEST) && (m_type != TYPE_STREAM)) {
+            (m_type != TYPE_PVR) && (m_type != TYPE_REQUEST) && (m_type != TYPE_STREAM) && (m_type != TYPE_QXML_STREAM)) {
         qDebug() << "Wrong convert type";
         exit(1);
     }

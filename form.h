@@ -32,6 +32,10 @@ private slots:
     void slotStreamPlanned(int count, int amount);
     void slotStreamsFailed(int count);
     void slotPlanFinished();
+    void slotOffsetStream(int VP, int KP, int NP, int hours);
+    void slotXMLReady(QByteArray &ba);
+
+    void on_pushButtonGetXML_clicked();
 
 private:
     Ui::Form *ui;
