@@ -33,9 +33,9 @@ private slots:
     void slotStreamsFailed(int count);
     void slotPlanFinished();
     void slotOffsetStream(int VP, int KP, int NP, int hours);
-    void slotXMLReady(QByteArray &ba);
+    void slotF2Ready(QByteArray &ba);
 
-    void on_pushButtonGetXML_clicked();
+    void on_pushButtonGetF2_clicked();
 
 private:
     Ui::Form *ui;

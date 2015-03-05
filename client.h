@@ -41,7 +41,7 @@ signals:
     void signalStreamsFailed(int count);
     void signalPlanFinished();
     void signalOffsetStream(int VP, int KP, int NP, int hours);
-    void signalXMLReady(QByteArray &ba);
+    void signalF2Ready(QByteArray &ba);
 
 private:
     //сокет на запись

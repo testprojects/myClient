@@ -4,8 +4,10 @@
 #include "packet.h"
 #include "widgetplanstream.h"
 #include "dialogstreamoffset.h"
+#include "dialogf2.h"
 
 #include <QtWidgets>
+#include <QXmlStreamReader>
 
 const QString SERVER_IP = "127.0.0.1";
 const quint16 SERVER_PORT = 1535;
@@ -20,6 +22,7 @@ Form::Form(QWidget *parent) :
     ui->pushButtonSendRequest->setEnabled(false);
     ui->pushButtonLoadRequestDikon->setEnabled(false);
     ui->pushButtonLoadRequestZhenya->setEnabled(false);
+    ui->pushButtonGetF2->setEnabled(false);
     m_client = new Client(SERVER_IP, SERVER_PORT, this);
     connect(m_client, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(m_client, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
@@ -30,7 +33,7 @@ Form::Form(QWidget *parent) :
     connect(m_client, SIGNAL(signalStreamsFailed(int)), this, SLOT(slotStreamsFailed(int)));
     connect(m_client, SIGNAL(signalPlanFinished()), this, SLOT(slotPlanFinished()));
     connect(m_client, SIGNAL(signalOffsetStream(int, int, int, int)), this, SLOT(slotOffsetStream(int, int, int, int)));
-    connect(m_client, SIGNAL(signalXMLReady(QByteArray&)), this, SLOT(slotXMLReady(QByteArray&)));
+    connect(m_client, SIGNAL(signalF2Ready(QByteArray&)), this, SLOT(slotF2Ready(QByteArray&)));
 }
 
 Form::~Form()
@@ -59,6 +62,7 @@ void Form::onConnected()
     ui->pushButtonSendRequest->setEnabled(true);
     ui->pushButtonLoadRequestDikon->setEnabled(true);
     ui->pushButtonLoadRequestZhenya->setEnabled(true);
+    ui->pushButtonGetF2->setEnabled(true);
 }
 
 void Form::onDisconnected()
@@ -68,6 +72,7 @@ void Form::onDisconnected()
     ui->pushButtonSendRequest->setEnabled(false);
     ui->pushButtonLoadRequestDikon->setEnabled(false);
     ui->pushButtonLoadRequestZhenya->setEnabled(false);
+    ui->pushButtonGetF2->setEnabled(false);
 }
 
 
@@ -169,12 +174,31 @@ void Form::slotOffsetStream(int VP, int KP, int NP, int hours)
     m_client->sendMessage(message);
 }
 
-void Form::on_pushButtonGetXML_clicked()
+void Form::on_pushButtonGetF2_clicked()
 {
-    m_client->sendMessage(QString("%1").arg(GET_XML));
+    DialogF2 dialog;
+    int res = dialog.exec();
+    if(res == QDialog::Accepted) {
+        //формируем запрос на составление сервером формы Ф2
+        QString message(QString("%1,%2,%3,%4,%5,%6,%7,%8")
+                 .arg(GET_F2)
+                 .arg(dialog.VP_Start)
+                 .arg(dialog.VP_End)
+                 .arg(dialog.KP_Start)
+                 .arg(dialog.KP_End)
+                 .arg(dialog.NP_Start)
+                 .arg(dialog.NP_End)
+                 .arg(dialog.grif)
+                 );
+        m_client->sendMessage(message);
+    }
 }
 
-void Form::slotXMLReady(QByteArray &ba)
+void Form::slotF2Ready(QByteArray &ba)
 {
-    ui->textBrowser->append(ba);
+    QXmlStreamReader xmlReader(ba);//заполненный XML
+    QMessageBox::information(this, "F2 (XML)", ba);
+    //парсим XML
+    //создаём .doc
+    //выводим на экран
 }

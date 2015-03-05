@@ -100,9 +100,9 @@ void Client::readPacket()
             emit stringRecieved(strStation);
             break;
         }
-        case TYPE_QXML_STREAM:
+        case TYPE_XML_F2:
         {
-            emit signalXMLReady(block);
+            emit signalF2Ready(block);
             break;
         }
         default:

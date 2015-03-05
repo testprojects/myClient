@@ -65,27 +65,17 @@
     <string>Загрузить заявку с ПК (Женя)</string>
    </property>
   </widget>
-  <widget class="QTextBrowser" name="textBrowser">
+  <widget class="QPushButton" name="pushButtonGetF2">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>110</y>
-     <width>256</width>
-     <height>192</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButtonGetXML">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
+     <x>423</x>
      <y>80</y>
-     <width>114</width>
+     <width>211</width>
      <height>32</height>
     </rect>
    </property>
    <property name="text">
-    <string>getXML</string>
+    <string>Сформировать форму Ф2</string>
    </property>
   </widget>
  </widget>
