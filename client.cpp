@@ -54,23 +54,24 @@ void Client::sendMessage(const QString &message)
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_0);
-    out << (quint16)0;
+    out << (quint32)0;
     out << message;
     out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
+    out << (quint32)(block.size() - sizeof(quint32));
 
     m_tcpSocket->write(block);
     m_tcpSocket->flush();
     qDebug() << "Sended message: " << message;
+    qDebug() << "Block size    : " << (quint32)(block.size() - sizeof(quint32));
 }
 
 void Client::readPacket()
 {
-    quint16 blockSize;
+    quint32 blockSize;
     QDataStream in(m_tcpSocket);
     in.setVersion(QDataStream::Qt_4_0);
     while(m_tcpSocket->bytesAvailable()) {
-        while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint16)) {}
+        while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint32)) {}
         in >> blockSize;
         while(m_tcpSocket->bytesAvailable() < blockSize) {}
         Type type;
@@ -145,5 +146,8 @@ void Client::dispatchMessage(QString message)
         int NP = list[2].toInt();
         int hours = list[3].toInt();
         emit signalOffsetStream(VP, KP, NP, hours);
+    }
+    else if(message.startsWith("REQUESTS_ADDED")) {
+        qDebug() << "Requests added to server";
     }
 }

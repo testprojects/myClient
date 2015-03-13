@@ -11,7 +11,7 @@
 
 const QString SERVER_IP = "127.0.0.1";
 const quint16 SERVER_PORT = 1535;
-const int STRETCH = 1;
+const int STRETCH = 0;
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
@@ -73,6 +73,14 @@ void Form::onDisconnected()
     ui->pushButtonLoadRequestDikon->setEnabled(false);
     ui->pushButtonLoadRequestZhenya->setEnabled(false);
     ui->pushButtonGetF2->setEnabled(false);
+
+    QMessageBox::information(this, "Ощибка на сервере", "Сервер недоступен - разрыв соединения");
+    if(m_progressBar)
+        delete m_progressBar;
+    if(m_labelStreamsPlanned)
+        delete m_labelStreamsPlanned;
+    if(m_layoutProgress)
+        delete m_layoutProgress;
 }
 
 
@@ -104,6 +112,7 @@ void Form::on_pushButtonSendRequest_clicked()
 
 void Form::displayMessage(const QString &message)
 {
+    qDebug() << "displayMessage: " << message;
 }
 
 void Form::on_pushButtonLoadRequestDikon_clicked()
@@ -111,7 +120,11 @@ void Form::on_pushButtonLoadRequestDikon_clicked()
     QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Дикон)", QDir::home().path(), "Text *.txt");
 
     if(!filePath.isEmpty()) {
-        QString strCommand = QString("LOAD_STREAM(%1)").arg(filePath);
+        QFile file(filePath);
+        file.open(QIODevice::ReadOnly);
+        QString data;
+        data = file.readAll();
+        QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_DIKON).arg(data);
         m_client->sendMessage(strCommand);
     }
 }
@@ -120,7 +133,11 @@ void Form::on_pushButtonLoadRequestZhenya_clicked()
 {
     QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Женя)", QDir::home().path(), "*.fps");
     if(!filePath.isEmpty()) {
-        QString strCommand = QString("LOAD_STREAM(%1)").arg(filePath);
+        QFile file(filePath);
+        file.open(QIODevice::ReadOnly);
+        QString data;
+        data = file.readAll();
+        QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_ZHENYA).arg(data);
         m_client->sendMessage(strCommand);
     }
 }
@@ -136,8 +153,10 @@ void Form::slotPlanStarted()
     m_labelStreamsPlanned = new QLabel(this);
     m_labelStreamsPlanned->setText("COUNT / TOTAL");
 
-    m_layoutProgress->addWidget(m_progressBar, STRETCH, Qt::AlignCenter|Qt::AlignBottom);
-    m_layoutProgress->addWidget(m_labelStreamsPlanned, STRETCH, Qt::AlignCenter|Qt::AlignBottom);
+    m_layoutProgress->addSpacing(height() - STRETCH * 2 - m_progressBar->height() - m_labelStreamsPlanned->height());
+    m_layoutProgress->addWidget(m_progressBar);
+    m_layoutProgress->addWidget(m_labelStreamsPlanned);
+    setLayout(m_layoutProgress);
 }
 
 void Form::slotStreamPlanned(int count, int amount)
@@ -161,6 +180,8 @@ void Form::slotPlanFinished()
         delete m_progressBar;
     if(m_labelStreamsPlanned)
         delete m_labelStreamsPlanned;
+    if(m_layoutProgress)
+        delete m_layoutProgress;
 }
 
 void Form::slotOffsetStream(int VP, int KP, int NP, int hours)
