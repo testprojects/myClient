@@ -4,8 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += network gui widgets
-INCLUDEPATH += /Users/artem/projects/plan/
+QT       += network gui widgets xml
+
 TARGET = myClient
 TEMPLATE = app
 
@@ -22,7 +22,7 @@ SOURCES += main.cpp \
 #    ../plan/pvr.cpp \
 #    ../plan/request.cpp \
 #    ../plan/section.cpp \
-#    ../plan/station.cpp \
+    ../plan/station.cpp \
 #    ../plan/stream.cpp
 
 HEADERS += \
@@ -30,14 +30,14 @@ HEADERS += \
     form.h \
     packet.h \
     types.h \
-    ../plan/echelon.h \
-    ../plan/mytime.h \
-    ../plan/ps.h \
-    ../plan/pvr.h \
-    ../plan/request.h \
-    ../plan/section.h \
-    ../plan/station.h \
-    ../plan/stream.h \
+#    ../plan/echelon.h \
+#    ../plan/mytime.h \
+#    ../plan/ps.h \
+#    ../plan/pvr.h \
+#    ../plan/request.h \
+#    ../plan/section.h \
+#    ../plan/station.h \
+#    ../plan/stream.h \
     widgetplanstream.h \
     dialogstreamoffset.h \
     dialogf2.h

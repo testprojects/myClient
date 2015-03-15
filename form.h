@@ -8,6 +8,8 @@ namespace Ui {
 class Form;
 }
 
+class QDomDocument;
+class QDomElement;
 class Form : public QWidget
 {
     Q_OBJECT
@@ -33,11 +35,15 @@ private slots:
     void slotStreamsFailed(int count);
     void slotPlanFinished();
     void slotOffsetStream(int VP, int KP, int NP, int hours);
-    void slotF2Ready(QByteArray &ba);
+    void parsingXmlForm2(QByteArray &ba);
 
     void on_pushButtonGetF2_clicked();
 
 private:
+    QDomDocument* openTemplate();
+    void formationDocument(QDomDocument*, const QStringList&);
+    QDomElement addTextElement(QDomDocument, const QString &text = QString());
+
     Ui::Form *ui;
     Client *m_client;
 
