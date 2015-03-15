@@ -1,10 +1,10 @@
 #include <QDataStream>
 #include "packet.h"
 #include "types.h"
-#include "station.h"
-#include "section.h"
-#include "pvr.h"
-#include "stream.h"
+#include "../plan/station.h"
+#include "../plan/section.h"
+#include "../plan/pvr.h"
+#include "../plan/stream.h"
 #include <QDebug>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
