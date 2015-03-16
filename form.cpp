@@ -7,7 +7,8 @@
 #include "dialogf2.h"
 
 #include <QtWidgets>
-#include <QXmlStreamReader>
+#include <QtCore/QXmlStreamReader>
+#include <QtXml/QDomDocument>
 
 const QString SERVER_IP = "127.0.0.1";
 const quint16 SERVER_PORT = 1535;
@@ -33,7 +34,7 @@ Form::Form(QWidget *parent) :
     connect(m_client, SIGNAL(signalStreamsFailed(int)), this, SLOT(slotStreamsFailed(int)));
     connect(m_client, SIGNAL(signalPlanFinished()), this, SLOT(slotPlanFinished()));
     connect(m_client, SIGNAL(signalOffsetStream(int, int, int, int)), this, SLOT(slotOffsetStream(int, int, int, int)));
-    connect(m_client, SIGNAL(signalF2Ready(QByteArray&)), this, SLOT(slotF2Ready(QByteArray&)));
+    connect(m_client, SIGNAL(signalF2Ready(QByteArray&)), this, SLOT(parsingXmlForm2(QByteArray&)));
 }
 
 Form::~Form()
@@ -215,11 +216,89 @@ void Form::on_pushButtonGetF2_clicked()
     }
 }
 
-void Form::slotF2Ready(QByteArray &ba)
+void Form::parsingXmlForm2(QByteArray &ba)
 {
-    QXmlStreamReader xmlReader(ba);//заполненный XML
-    QMessageBox::information(this, "F2 (XML)", ba);
-    //парсим XML
-    //создаём .doc
-    //выводим на экран
+    QDomDocument *domDoc = openTemplate();
+    QXmlStreamReader xmlReader(ba);     //заполненный XML
+    QStringList streamStr = QStringList();
+
+    do
+    {
+        xmlReader.readNext();
+        if (xmlReader.isStartElement()) {
+            if (xmlReader.name() == "document") {
+            }
+            else if (xmlReader.name() == "stream") {
+                if (!streamStr.isEmpty())
+                    formationDocument(domDoc, streamStr);
+
+                streamStr.clear();
+            }
+            else if (xmlReader.name() == "typeTransport")
+                streamStr << xmlReader.readElementText();
+            else if ((xmlReader.name() == "codeRecipient"))
+                streamStr << xmlReader.readElementText();
+            else if ((xmlReader.name() == "numberStream"))
+                streamStr << xmlReader.readElementText();
+        }
+    } while(!xmlReader.atEnd());
+
+    if (xmlReader.hasError()) {
+        qDebug() << "Parsing XML: " << xmlReader.errorString();
+        QMessageBox::critical(this, tr("Ошибка"), tr("Ошибка при чтении данных: %1").arg(xmlReader.errorString()));
+    }
+
+    QFile file("ppz_out.xml");
+    if(file.open(QIODevice::WriteOnly)) {
+        QTextStream(&file) << domDoc->toString();
+        file.close();
+    }
+}
+
+QDomDocument* Form::openTemplate()
+{
+    QDomDocument *domDoc = new QDomDocument;
+    QFile file("ppz.xml");
+    if(file.open(QIODevice::ReadOnly)) {
+        domDoc->setContent(&file);
+        file.close();
+    }
+
+    return domDoc;
+}
+
+void Form::formationDocument(QDomDocument *doc, const QStringList &list)
+{
+    QDomDocument domDoc = *doc;
+    QDomElement tableElement = domDoc.elementsByTagName("w:tbl").at(0).toElement();
+    QDomElement newRowElement = domDoc.createElement("w:tr");
+
+    for (int iCol = 0; iCol < 17; iCol++) {
+        QDomElement colElement = domDoc.createElement("w:tc");
+        switch (iCol) {
+            case 0: {
+                colElement.appendChild(addTextElement(domDoc, QString("%1/%2").arg(list[0], list[1])));
+                colElement.appendChild(addTextElement(domDoc, list[2]));
+                break;
+            }
+            default: {
+                colElement.appendChild(addTextElement(domDoc));
+            }
+        }
+        newRowElement.appendChild(colElement);
+    }
+    tableElement.appendChild(newRowElement);
+}
+
+QDomElement Form::addTextElement(QDomDocument domDoc,const QString &text)
+{
+    QDomElement p = domDoc.createElement("w:p");
+    QDomElement r = domDoc.createElement("w:r");
+    QDomElement t = domDoc.createElement("w:t");
+    QDomText domText = domDoc.createTextNode(text);
+
+    t.appendChild(domText);
+    r.appendChild(t);
+    p.appendChild(r);
+    return p;
 }
