@@ -1,7 +1,7 @@
 #include "client.h"
 #include <QtNetwork>
 #include "packet.h"
-#include "station.h"
+#include "../plan/station.h"
 #include "assert.h"
 
 const int CONNECTION_INTERVAL = 1000;
