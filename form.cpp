@@ -210,6 +210,11 @@ void Form::on_pushButtonGetF2_clicked()
                  .arg(dialog.NP_End)
                  .arg(dialog.grif)
                  );
+        message += QString(",%1,%2,%3,%4")
+                .arg(dialog.devideByKG)
+                .arg(dialog.devideByOKR)
+                .arg(dialog.actionOKR)
+                .arg(dialog.okr);
         m_client->sendMessage(message);
     }
 }
