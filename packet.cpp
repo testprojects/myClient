@@ -66,16 +66,6 @@ Station Packet::decodeToStation()
     for(int i = 0; i < 60; i++) in >> st.loadingPossibilities25[i];
     in >> st.roadNumber;
 
-//    out << st.number << st.type << st.name << st.latitude << st.longitude
-//        << st.startNumber << st.endNumber << st.distanceTillStart << st.distanceTillEnd
-//        << st.pvrNumber << st.loadingCapacity23 << st.loadingCapacity24_BP << st.loadingCapacity24_GSM
-//        << st.loadingCapacity24_PR << st.loadingCapacity25;
-//    for(int i = 0; i < 60; i++) out << st.loadingPossibilities23[i];
-//    for(int i = 0; i < 60; i++) out << st.loadingPossibilities24_BP[i];
-//    for(int i = 0; i < 60; i++) out << st.loadingPossibilities24_GSM[i];
-//    for(int i = 0; i < 60; i++) out << st.loadingPossibilities24_PR[i];
-//    for(int i = 0; i < 60; i++) out << st.loadingPossibilities25[i];
-//    out << st.roadNumber;
     return st;
 }
 

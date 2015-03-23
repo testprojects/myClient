@@ -3,6 +3,7 @@
 #include "packet.h"
 #include "../plan/station.h"
 #include "assert.h"
+#include "../plan/pauser.h"
 
 const int CONNECTION_INTERVAL = 1000;
 
@@ -54,26 +55,38 @@ void Client::sendMessage(const QString &message)
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_0);
-    out << (quint16)0;
+    out << (quint32)0;
     out << message;
     out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
+    out << (quint32)(block.size() - sizeof(quint32));
 
     m_tcpSocket->write(block);
     m_tcpSocket->flush();
     qDebug() << "Sended message: " << message;
+    qDebug() << "Block size    : " << (quint32)(block.size() - sizeof(quint32));
 }
 
 void Client::readPacket()
 {
-    quint16 blockSize;
+    quint32 blockSize;
     QDataStream in(m_tcpSocket);
     in.setVersion(QDataStream::Qt_4_0);
     while(m_tcpSocket->bytesAvailable()) {
-        while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint16)) {}
+        while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint32)) {}
         in >> blockSize;
         while(m_tcpSocket->bytesAvailable() < blockSize) {
             QCoreApplication::processEvents();
+            //readyRead() is not emitted recursively; if you reenter the event loop or call waitForReadyRead()
+            //inside a slot connected to the readyRead() signal, the signal will not be reemitted (although waitForReadyRead()
+            //may still return true).
+            //Отдельному обработчику событий нужен доступ к сокету, чтобы в
+            Pauser pauser(m_tcpSocket);
+
+            QTimer timer;
+            timer.setInterval(100);
+            QObject::connect(&timer, SIGNAL(timeout()), &pauser, SLOT(checkIfDataRecieved()));
+            timer.start();
+            pauser.exec();
         }
         Type type;
         quint8 t;
@@ -147,5 +160,8 @@ void Client::dispatchMessage(QString message)
         int NP = list[2].toInt();
         int hours = list[3].toInt();
         emit signalOffsetStream(VP, KP, NP, hours);
+    }
+    else if(message.startsWith("REQUESTS_ADDED")) {
+        qDebug() << "Requests added to server";
     }
 }
