@@ -77,11 +77,9 @@ void Form::onDisconnected()
 
     QMessageBox::information(this, "Ощибка на сервере", "Сервер недоступен - разрыв соединения");
     if(m_progressBar)
-        delete m_progressBar;
+        m_progressBar->hide();
     if(m_labelStreamsPlanned)
-        delete m_labelStreamsPlanned;
-    if(m_layoutProgress)
-        delete m_layoutProgress;
+        m_labelStreamsPlanned->hide();
 }
 
 
