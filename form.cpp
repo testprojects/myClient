@@ -77,11 +77,9 @@ void Form::onDisconnected()
 
     QMessageBox::information(this, "Ощибка на сервере", "Сервер недоступен - разрыв соединения");
     if(m_progressBar)
-        delete m_progressBar;
+        m_progressBar->hide();
     if(m_labelStreamsPlanned)
-        delete m_labelStreamsPlanned;
-    if(m_layoutProgress)
-        delete m_layoutProgress;
+        m_labelStreamsPlanned->hide();
 }
 
 
@@ -202,16 +200,20 @@ void Form::on_pushButtonGetF2_clicked()
     int res = dialog.exec();
     if(res == QDialog::Accepted) {
         //формируем запрос на составление сервером формы Ф2
-        QString message(QString("%1,%2,%3,%4,%5,%6,%7,%8")
+        QString message(QString("%1,%2,%3,%4,%5,%6,%7")
                  .arg(GET_F2)
-                 .arg(dialog.VP_Start)
-                 .arg(dialog.VP_End)
+                 .arg(dialog.VP)
                  .arg(dialog.KP_Start)
                  .arg(dialog.KP_End)
                  .arg(dialog.NP_Start)
                  .arg(dialog.NP_End)
                  .arg(dialog.grif)
                  );
+        message += QString(",%1,%2,%3,%4")
+                .arg(dialog.devideByKG)
+                .arg(dialog.devideByOKR)
+                .arg(dialog.actionOKR)
+                .arg(dialog.okr);
         m_client->sendMessage(message);
     }
 }

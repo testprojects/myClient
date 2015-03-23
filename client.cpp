@@ -3,6 +3,7 @@
 #include "packet.h"
 #include "../plan/station.h"
 #include "assert.h"
+#include "../plan/pauser.h"
 
 const int CONNECTION_INTERVAL = 1000;
 
@@ -73,7 +74,9 @@ void Client::readPacket()
     while(m_tcpSocket->bytesAvailable()) {
         while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint32)) {}
         in >> blockSize;
-        while(m_tcpSocket->bytesAvailable() < blockSize) {}
+        while(m_tcpSocket->bytesAvailable() < blockSize) {
+            QCoreApplication::processEvents();
+        }
         Type type;
         quint8 t;
         in >> t;
