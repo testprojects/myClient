@@ -22,9 +22,8 @@ SOURCES += main.cpp \
 #    ../plan/pvr.cpp \
 #    ../plan/request.cpp \
 #    ../plan/section.cpp \
-    ../plan/station.cpp \
+#    ../plan/station.cpp \
 #    ../plan/stream.cpp
-    ../plan/pauser.cpp
 
 HEADERS += \
     client.h \
@@ -42,7 +41,6 @@ HEADERS += \
     widgetplanstream.h \
     dialogstreamoffset.h \
     dialogf2.h \
-    ../plan/pauser.h
 
 FORMS += \
     form.ui \

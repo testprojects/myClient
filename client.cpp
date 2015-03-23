@@ -75,17 +75,7 @@ void Client::readPacket()
         while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint32)) {}
         in >> blockSize;
         while(m_tcpSocket->bytesAvailable() < blockSize) {
-            //readyRead() is not emitted recursively; if you reenter the event loop or call waitForReadyRead()
-            //inside a slot connected to the readyRead() signal, the signal will not be reemitted (although waitForReadyRead()
-            //may still return true).
-            //Отдельному обработчику событий нужен доступ к сокету, чтобы в
-            Pauser pauser(m_tcpSocket);
-
-            QTimer timer;
-            timer.setInterval(100);
-            QObject::connect(&timer, SIGNAL(timeout()), &pauser, SLOT(checkIfDataRecieved()));
-            timer.start();
-            pauser.exec();
+            QCoreApplication::processEvents();
         }
         Type type;
         quint8 t;

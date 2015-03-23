@@ -32,17 +32,7 @@
   <widget class="QLineEdit" name="lineEdit_VP_Start">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>40</y>
-     <width>113</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_VP_End">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
+     <x>190</x>
      <y>40</y>
      <width>113</width>
      <height>21</height>
@@ -99,39 +89,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Виды перевозок</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>20</y>
-     <width>62</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>От</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>20</y>
-     <width>62</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>До</string>
+    <string>Вид перевозок</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -296,7 +254,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>370</y>
+     <y>430</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -330,40 +288,85 @@
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="comboBox_OKR">
+  <widget class="QCheckBox" name="checkBox_ZVO">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>400</x>
      <y>310</y>
-     <width>71</width>
-     <height>26</height>
+     <width>87</width>
+     <height>20</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>ЗВО</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>ВВО</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>ЮВО</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>СВО</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>ЦВО</string>
-    </property>
-   </item>
+   <property name="text">
+    <string>ЗВО</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_VVO">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>330</y>
+     <width>87</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ВВО</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_UVO">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>350</y>
+     <width>87</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ЮВО</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_CVO">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>370</y>
+     <width>87</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ЦВО</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_SF">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>390</y>
+     <width>87</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>СФ</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <resources/>

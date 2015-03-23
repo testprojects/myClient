@@ -19,7 +19,7 @@ private:
     Ui::DialogF2 *ui;
 
 public:
-    int VP_Start, VP_End;
+    int VP;
     int KP_Start, KP_End;
     int NP_Start, NP_End;
     QString grif;//security classification O_o
@@ -30,6 +30,7 @@ public:
 private slots:
     void on_buttonBox_accepted();
     void on_checkBox_OKR_stateChanged(int arg1);
+    void on_lineEdit_VP_Start_textChanged(const QString &arg1);
 };
 
 #endif // DIALOGF2_H
