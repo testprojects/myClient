@@ -72,7 +72,9 @@ void Client::readPacket()
     while(m_tcpSocket->bytesAvailable()) {
         while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint16)) {}
         in >> blockSize;
-        while(m_tcpSocket->bytesAvailable() < blockSize) {}
+        while(m_tcpSocket->bytesAvailable() < blockSize) {
+            QCoreApplication::processEvents();
+        }
         Type type;
         quint8 t;
         in >> t;

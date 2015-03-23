@@ -15,7 +15,8 @@ SOURCES += main.cpp \
     packet.cpp \
     widgetplanstream.cpp \
     dialogstreamoffset.cpp \
-    dialogf2.cpp
+    dialogf2.cpp \
+    document.cpp
 #    ../plan/echelon.cpp \
 #    ../plan/mytime.cpp \
 #    ../plan/ps.cpp \
@@ -40,7 +41,8 @@ HEADERS += \
 #    ../plan/stream.h \
     widgetplanstream.h \
     dialogstreamoffset.h \
-    dialogf2.h
+    dialogf2.h \
+    document.h
 
 FORMS += \
     form.ui \
