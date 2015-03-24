@@ -16,6 +16,10 @@ SOURCES += main.cpp \
     widgetplanstream.cpp \
     dialogstreamoffset.cpp \
     dialogf2.cpp \
+<<<<<<< HEAD
+=======
+    document.cpp
+>>>>>>> testing
 #    ../plan/echelon.cpp \
 #    ../plan/mytime.cpp \
 #    ../plan/ps.cpp \
@@ -41,6 +45,10 @@ HEADERS += \
     widgetplanstream.h \
     dialogstreamoffset.h \
     dialogf2.h \
+<<<<<<< HEAD
+=======
+    document.h
+>>>>>>> testing
 
 FORMS += \
     form.ui \
