@@ -119,6 +119,8 @@ void Client::readPacket()
             assert(0);
         }
         }
+
+        m_blockSize = 0;
     }
 }
 
