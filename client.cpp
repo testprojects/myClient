@@ -8,7 +8,7 @@
 const int CONNECTION_INTERVAL = 1000;
 
 Client::Client(QString serverIP, quint16 serverPort, QObject *parent):
-    QObject(parent), m_serverIP(serverIP), m_serverPort(serverPort)
+    QObject(parent), m_serverIP(serverIP), m_serverPort(serverPort), m_blockSize(0)
 {
     m_tcpSocket = new QTcpSocket(this);
     connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(readPacket()));
@@ -68,35 +68,29 @@ void Client::sendMessage(const QString &message)
 
 void Client::readPacket()
 {
-    quint32 blockSize;
     QDataStream in(m_tcpSocket);
     in.setVersion(QDataStream::Qt_4_0);
-    while(m_tcpSocket->bytesAvailable()) {
-        while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint32)) {}
-        in >> blockSize;
-        while(m_tcpSocket->bytesAvailable() < blockSize) {
-            QCoreApplication::processEvents();
-            //readyRead() is not emitted recursively; if you reenter the event loop or call waitForReadyRead()
-            //inside a slot connected to the readyRead() signal, the signal will not be reemitted (although waitForReadyRead()
-            //may still return true).
-            //Отдельному обработчику событий нужен доступ к сокету, чтобы в
-            Pauser pauser(m_tcpSocket);
-
-            QTimer timer;
-            timer.setInterval(100);
-            QObject::connect(&timer, SIGNAL(timeout()), &pauser, SLOT(checkIfDataRecieved()));
-            timer.start();
-            pauser.exec();
+    while(true) {
+        if(!m_blockSize) {
+            if(m_tcpSocket->bytesAvailable() < (int)sizeof(quint32)) {
+                return;
+            }
+            in >> m_blockSize;
         }
+
+        if(m_tcpSocket->bytesAvailable() < m_blockSize) {
+            return;
+        }
+        qDebug() << QString("%1 recieved").arg(m_blockSize);
         Type type;
         quint8 t;
         in >> t;
         type = (Type)t;
         QByteArray block;
-        block = m_tcpSocket->read(blockSize - sizeof(quint8));
+        block = m_tcpSocket->read(m_blockSize - sizeof(quint8));
 
         qDebug() << "bytes available: " << m_tcpSocket->bytesAvailable();
-        qDebug() << "block size     : " << blockSize;
+        qDebug() << "block size     : " << m_blockSize;
         qDebug() << "block          : " << block;
 
         switch(type) {
@@ -125,6 +119,8 @@ void Client::readPacket()
             assert(0);
         }
         }
+
+        m_blockSize = 0;
     }
 }
 

@@ -16,7 +16,7 @@ SOURCES += main.cpp \
     widgetplanstream.cpp \
     dialogstreamoffset.cpp \
     dialogf2.cpp \
-    document.cpp \
+    document.cpp
 #    ../plan/echelon.cpp \
 #    ../plan/mytime.cpp \
 #    ../plan/ps.cpp \
