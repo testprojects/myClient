@@ -6,10 +6,10 @@ DialogStreamOffset::DialogStreamOffset(int VP, int KP, int NP, int hours, QWidge
     ui(new Ui::DialogStreamOffset)
 {
     ui->setupUi(this);
-    ui->label_VP->setText(QString::number(m_VP));
-    ui->label_KP->setText(QString::number(m_KP));
-    ui->label_NP->setText(QString::number(m_NP));
-    ui->label_Hours->setText(QString::number(m_hours));
+    ui->label_VP->setText(QString("Вид перевозок: %1").arg(m_VP));
+    ui->label_KP->setText(QString("Код получателя: %1").arg(m_KP));
+    ui->label_NP->setText(QString("Номер потока: %1").arg(m_NP));
+    ui->label_Message->setText(QString("Заявка будет сдвинута на %1 часов").arg(m_hours));
 }
 
 DialogStreamOffset::~DialogStreamOffset()
@@ -21,8 +21,6 @@ void DialogStreamOffset::on_pushButton_YES_clicked()
 {
     done(1);
 }
-
-
 
 void DialogStreamOffset::on_pushButton_NO_clicked()
 {
