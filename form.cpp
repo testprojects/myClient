@@ -24,6 +24,13 @@ Form::Form(QWidget *parent) :
     m_labelStreamsPlanned = new QLabel(this);
     m_labelStreamsPlanned->setVisible(false);
 
+    m_progressBar->setFixedWidth(width());
+    m_progressBar->setRange(0, 1000);
+    m_layoutProgress->addSpacing(height() - STRETCH * 2 - m_progressBar->height() - m_labelStreamsPlanned->height());
+    m_layoutProgress->addWidget(m_progressBar);
+    m_layoutProgress->addWidget(m_labelStreamsPlanned);
+    setLayout(m_layoutProgress);
+
     ui->setupUi(this);
     ui->pushButtonSendRequest->setEnabled(false);
     ui->pushButtonSendRequest->setEnabled(false);
@@ -45,8 +52,6 @@ Form::Form(QWidget *parent) :
 
 Form::~Form()
 {
-    connect(m_client, SIGNAL(disconnected()), SLOT(deleteLater()));
-    m_client->disconnectFromServer();
     delete ui;
 }
 
@@ -147,18 +152,9 @@ void Form::on_pushButtonLoadRequestZhenya_clicked()
 
 void Form::slotPlanStarted()
 {
-    m_progressBar->setFixedWidth(width());
-    m_progressBar->setRange(0, 1000);
     m_progressBar->setVisible(true);
-
     m_labelStreamsPlanned->setText("COUNT / TOTAL");
     m_labelStreamsPlanned->setVisible(true);
-
-    m_layoutProgress->addSpacing(height() - STRETCH * 2 - m_progressBar->height() - m_labelStreamsPlanned->height());
-    m_layoutProgress->addWidget(m_progressBar);
-    m_layoutProgress->addWidget(m_labelStreamsPlanned);
-
-    setLayout(m_layoutProgress);
 }
 
 void Form::slotStreamPlanned(int count, int amount)

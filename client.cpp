@@ -62,7 +62,7 @@ void Client::sendMessage(const QString &message)
 
     m_tcpSocket->write(block);
     m_tcpSocket->flush();
-    qDebug() << "Sended message: " << message;
+    qDebug() << "Sended message: " << block;
     qDebug() << "Block size    : " << (quint32)(block.size() - sizeof(quint32));
 }
 
@@ -126,7 +126,7 @@ void Client::readPacket()
 
 void Client::dispatchMessage(QString message)
 {
-    qDebug() << "Despatching message: " << message;
+//    qDebug() << "Despatching message: " << message;
     if(message.startsWith("PLAN_STARTED")) {
         emit signalPlanStarted();
     }
