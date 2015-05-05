@@ -20,8 +20,11 @@ class Document : public QObject
         bool openTemplate();
         bool parsingXmlForm2(QByteArray &ba);
         void addRowToForm2(const QStringList&);
-        QDomElement addTextElement(const QString &text);
+        void addHeaderGroup(const QString&);
+        QDomElement addTextElement(const QString &text, const QString &align = QString("left"));
         QDomElement addColumnPropertyElement(TypeMerge merge, int span = 0);
+        QDomElement addCellFontPropertyElement();
+
 
         QDomDocument *rootDomDocument;
 };

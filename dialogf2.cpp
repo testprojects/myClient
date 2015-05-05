@@ -30,7 +30,7 @@ void DialogF2::on_buttonBox_accepted()
     devideByKG = ui->checkBox_KG->isChecked();
     devideByOKR = ui->checkBox_OKR->isChecked();
     if(devideByOKR) {
-        actionOKR = ui->comboBox_Action->currentText();
+        actionOKR = ui->comboBox_Action->currentIndex() + 1;    //как разделять по округам ["Прибытие в округ - 1", "Убытие из округа - 2", "Транзит через округ - 3"]
         okr = "";
         //(10-ЗВО, 20-ВВО, 30-ЮВО, 34-ЦВО)
         if(ui->checkBox_ZVO->isChecked()) okr += "10;";
@@ -41,7 +41,7 @@ void DialogF2::on_buttonBox_accepted()
         if(okr.endsWith(';')) okr.chop(1);
     }
     else {
-        actionOKR = "";
+        actionOKR = 0;
         okr = "";
     }
 }
