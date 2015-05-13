@@ -42,7 +42,7 @@ bool Document::parsingXmlForm2(QByteArray &ba)
         if (xmlReader.isStartElement()) {
             if (xmlReader.name() == "document") {
             }
-            else if (xmlReader.name() == "district") {
+            else if (xmlReader.name() == "district" || xmlReader.name() == "codeCargo") {
                 addHeaderGroup(xmlReader.readElementText());
             }
             else if (xmlReader.name() != "stream")
