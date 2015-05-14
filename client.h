@@ -49,6 +49,7 @@ private:
 public:
     QString m_serverIP;
     quint16 m_serverPort;
+    quint32 m_blockSize;
 };
 
 #endif // CLIENT_H

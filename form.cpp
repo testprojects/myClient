@@ -17,6 +17,20 @@ Form::Form(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Form)
 {
+    m_layoutProgress = new QVBoxLayout(this);
+
+    m_progressBar = new QProgressBar(this);
+    m_progressBar->setVisible(false);
+    m_labelStreamsPlanned = new QLabel(this);
+    m_labelStreamsPlanned->setVisible(false);
+
+    m_progressBar->setFixedWidth(width());
+    m_progressBar->setRange(0, 1000);
+    m_layoutProgress->addSpacing(height() - STRETCH * 2 - m_progressBar->height() - m_labelStreamsPlanned->height());
+    m_layoutProgress->addWidget(m_progressBar);
+    m_layoutProgress->addWidget(m_labelStreamsPlanned);
+    setLayout(m_layoutProgress);
+
     ui->setupUi(this);
     ui->pushButtonSendRequest->setEnabled(false);
     ui->pushButtonSendRequest->setEnabled(false);
@@ -38,8 +52,6 @@ Form::Form(QWidget *parent) :
 
 Form::~Form()
 {
-    connect(m_client, SIGNAL(disconnected()), SLOT(deleteLater()));
-    m_client->disconnectFromServer();
     delete ui;
 }
 
@@ -74,11 +86,9 @@ void Form::onDisconnected()
     ui->pushButtonLoadRequestZhenya->setEnabled(false);
     ui->pushButtonGetF2->setEnabled(false);
 
-    QMessageBox::information(this, "Ощибка на сервере", "Сервер недоступен - разрыв соединения");
-    if(m_progressBar)
-        m_progressBar->hide();
-    if(m_labelStreamsPlanned)
-        m_labelStreamsPlanned->hide();
+    QMessageBox::information(this, "Разрыв соединения", "Сервер недоступен");
+    m_progressBar->hide();
+    m_labelStreamsPlanned->hide();
 }
 
 
@@ -142,19 +152,9 @@ void Form::on_pushButtonLoadRequestZhenya_clicked()
 
 void Form::slotPlanStarted()
 {
-    m_layoutProgress = new QVBoxLayout(this);
-
-    m_progressBar = new QProgressBar(this);
-    m_progressBar->setFixedWidth(width());
-    m_progressBar->setRange(0, 1000);
-
-    m_labelStreamsPlanned = new QLabel(this);
+    m_progressBar->setVisible(true);
     m_labelStreamsPlanned->setText("COUNT / TOTAL");
-
-    m_layoutProgress->addSpacing(height() - STRETCH * 2 - m_progressBar->height() - m_labelStreamsPlanned->height());
-    m_layoutProgress->addWidget(m_progressBar);
-    m_layoutProgress->addWidget(m_labelStreamsPlanned);
-    setLayout(m_layoutProgress);
+    m_labelStreamsPlanned->setVisible(true);
 }
 
 void Form::slotStreamPlanned(int count, int amount)
@@ -174,12 +174,8 @@ void Form::slotStreamsFailed(int count)
 void Form::slotPlanFinished()
 {
     QMessageBox::information(this, "Планирование завершено", "Планирование завершено");
-    if(m_progressBar)
-        delete m_progressBar;
-    if(m_labelStreamsPlanned)
-        delete m_labelStreamsPlanned;
-    if(m_layoutProgress)
-        delete m_layoutProgress;
+    m_progressBar->hide();
+    m_labelStreamsPlanned->hide();
 }
 
 void Form::slotOffsetStream(int VP, int KP, int NP, int hours)

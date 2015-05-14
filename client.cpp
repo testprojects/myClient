@@ -8,7 +8,7 @@
 const int CONNECTION_INTERVAL = 1000;
 
 Client::Client(QString serverIP, quint16 serverPort, QObject *parent):
-    QObject(parent), m_serverIP(serverIP), m_serverPort(serverPort)
+    QObject(parent), m_serverIP(serverIP), m_serverPort(serverPort), m_blockSize(0)
 {
     m_tcpSocket = new QTcpSocket(this);
     connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(readPacket()));
@@ -62,30 +62,35 @@ void Client::sendMessage(const QString &message)
 
     m_tcpSocket->write(block);
     m_tcpSocket->flush();
-    qDebug() << "Sended message: " << message;
+    qDebug() << "Sended message: " << block;
     qDebug() << "Block size    : " << (quint32)(block.size() - sizeof(quint32));
 }
 
 void Client::readPacket()
 {
-    quint32 blockSize;
     QDataStream in(m_tcpSocket);
     in.setVersion(QDataStream::Qt_4_0);
-    while(m_tcpSocket->bytesAvailable()) {
-        while(m_tcpSocket->bytesAvailable() < (int)sizeof(quint32)) {}
-        in >> blockSize;
-        while(m_tcpSocket->bytesAvailable() < blockSize) {
-            QCoreApplication::processEvents();
+    while(true) {
+        if(!m_blockSize) {
+            if(m_tcpSocket->bytesAvailable() < (int)sizeof(quint32)) {
+                return;
+            }
+            in >> m_blockSize;
         }
+
+        if(m_tcpSocket->bytesAvailable() < m_blockSize) {
+            return;
+        }
+        qDebug() << QString("%1 recieved").arg(m_blockSize);
         Type type;
         quint8 t;
         in >> t;
         type = (Type)t;
         QByteArray block;
-        block = m_tcpSocket->read(blockSize - sizeof(quint8));
+        block = m_tcpSocket->read(m_blockSize - sizeof(quint8));
 
         qDebug() << "bytes available: " << m_tcpSocket->bytesAvailable();
-        qDebug() << "block size     : " << blockSize;
+        qDebug() << "block size     : " << m_blockSize;
         qDebug() << "block          : " << block;
 
         switch(type) {
@@ -114,12 +119,14 @@ void Client::readPacket()
             assert(0);
         }
         }
+
+        m_blockSize = 0;
     }
 }
 
 void Client::dispatchMessage(QString message)
 {
-    qDebug() << "Despatching message: " << message;
+//    qDebug() << "Despatching message: " << message;
     if(message.startsWith("PLAN_STARTED")) {
         emit signalPlanStarted();
     }

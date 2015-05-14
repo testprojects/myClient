@@ -25,7 +25,7 @@ public:
     QString grif;//security classification O_o
     bool devideByOKR;
     bool devideByKG;
-    QString actionOKR;
+    int actionOKR;
     QString okr;
 private slots:
     void on_buttonBox_accepted();

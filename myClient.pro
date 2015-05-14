@@ -43,6 +43,7 @@ HEADERS += \
     dialogstreamoffset.h \
     dialogf2.h \
     document.h
+    ../plan/pauser.h
 
 FORMS += \
     form.ui \
