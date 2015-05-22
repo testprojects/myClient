@@ -36,11 +36,16 @@ private slots:
     void dispatchMessage(QString message);
 
 signals:
+    void signalPausePlanning();
+    void signalAbortPlanning(bool bSavePlannedStreams = true);
+    void signalContinuePlanning();
+
+
     void signalPlanStarted();
     void signalPlanned(int count, int amount);
     void signalStreamsFailed(int count);
     void signalPlanFinished();
-    void signalOffsetStream(int VP, int KP, int NP, int hours);
+    void signalOffsetStream(QString strPassedStations, QString strDepartureTime, int NP, int hours);
     void signalF2Ready(QByteArray &ba);
 
 private:

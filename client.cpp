@@ -4,6 +4,7 @@
 #include "../plan/station.h"
 #include "assert.h"
 #include "../plan/pauser.h"
+#include <QMessageBox>
 
 const int CONNECTION_INTERVAL = 1000;
 
@@ -151,11 +152,29 @@ void Client::dispatchMessage(QString message)
         message.remove(0, QString::fromUtf8("OFFSET_STREAM(").length());
         message.chop(1);
         QStringList list = message.split(',');
-        int VP = list[0].toInt();
-        int KP = list[1].toInt();
+        QString strPassedStations = list[0];
+        QString strDepartureTime = list[1];
         int NP = list[2].toInt();
         int hours = list[3].toInt();
-        emit signalOffsetStream(VP, KP, NP, hours);
+        emit signalOffsetStream(strPassedStations, strDepartureTime, NP, hours);
+    }
+    else if(message.startsWith("STREAM_PLAN_FAILED")){
+        //приостанавливаем планирование
+        emit signalPausePlanning();
+
+        message.remove(0, QString::fromUtf8("STREAM_PLAN_FAILED(").length());
+        message.chop(1);
+        message.append(QString::fromUtf8(". Продолжить планирование?"));
+        int answer;
+        answer = QMessageBox::warning(NULL, QString::fromUtf8("Поток не спланирован"), message, QMessageBox::Yes, QMessageBox::No);
+        if(answer == QMessageBox::Yes) {
+            //продолжить планирование
+            emit signalContinuePlanning();
+        }
+        else {
+            emit signalAbortPlanning();
+            //прекратить планирование
+        }
     }
     else if(message.startsWith("REQUESTS_ADDED")) {
         qDebug() << "Requests added to server";

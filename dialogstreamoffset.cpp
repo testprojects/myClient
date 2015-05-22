@@ -1,13 +1,14 @@
 #include "dialogstreamoffset.h"
 #include "ui_dialogstreamoffset.h"
 
-DialogStreamOffset::DialogStreamOffset(int VP, int KP, int NP, int hours, QWidget *parent) :
-    m_VP(VP), m_KP(KP), m_NP(NP), m_hours(hours), QDialog(parent),
-    ui(new Ui::DialogStreamOffset)
+DialogStreamOffset::DialogStreamOffset(QString strPassedStations, QString strDepartureTime, int NP, int hours, QWidget *parent) :
+    m_route(strPassedStations), m_originalDepartureTime(strDepartureTime), m_NP(NP), m_hours(hours), ui(new Ui::DialogStreamOffset),
+    QDialog(parent)
 {
     ui->setupUi(this);
-    ui->label_VP->setText(QString("Вид перевозок: %1").arg(m_VP));
-    ui->label_KP->setText(QString("Код получателя: %1").arg(m_KP));
+    ui->label_VP->setText(QString("Маршрут потока: %1").arg(m_route));
+    ui->label_VP->setWordWrap(true);
+    ui->label_KP->setText(QString("Оригинальное время отправления: %1").arg(m_originalDepartureTime));
     ui->label_NP->setText(QString("Номер потока: %1").arg(m_NP));
     ui->label_Message->setText(QString("Заявка будет сдвинута на %1 часов").arg(m_hours));
 }
