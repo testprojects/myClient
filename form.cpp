@@ -6,6 +6,8 @@
 #include "dialogstreamoffset.h"
 #include "dialogf2.h"
 #include "document.h"
+#include "streamsdialog.h"
+#include "settingsdialog.h"
 
 #include <QtWidgets>
 
@@ -46,12 +48,15 @@ Form::Form(QWidget *parent) :
     connect(m_client, SIGNAL(signalPlanned(int,int)), this, SLOT(slotStreamPlanned(int,int)));
     connect(m_client, SIGNAL(signalStreamsFailed(int)), this, SLOT(slotStreamsFailed(int)));
     connect(m_client, SIGNAL(signalPlanFinished()), this, SLOT(slotPlanFinished()));
-    connect(m_client, SIGNAL(signalOffsetStream(QString, QString, int, int)), this, SLOT(slotOffsetStream(QString, QString, int, int)));
+    connect(m_client, SIGNAL(signalOffsetStream(int, int, int, int)), this, SLOT(slotOffsetStream(int, int, int, int)));
     connect(m_client, SIGNAL(signalF2Ready(QByteArray&)), this, SLOT(createDocument(QByteArray&)));
 
     connect(m_client, SIGNAL(signalPausePlanning()), this, SLOT(slotPausePlanning()));
     connect(m_client, SIGNAL(signalContinuePlanning()), this, SLOT(slotContinuePlanning()));
     connect(m_client, SIGNAL(signalAbortPlanning(bool)), this, SLOT(slotAbortPlanning(bool)));
+
+    connect(ui->streamsButton, SIGNAL(clicked()), this, SLOT(showStreamsDialog()));
+    connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(showSettingsDialog()));
 }
 
 Form::~Form()
@@ -79,6 +84,7 @@ void Form::onConnected()
     ui->pushButtonLoadRequestDikon->setEnabled(true);
     ui->pushButtonLoadRequestZhenya->setEnabled(true);
     ui->pushButtonGetF2->setEnabled(true);
+    ui->streamsButton->setEnabled(true);
 }
 
 void Form::onDisconnected()
@@ -89,6 +95,7 @@ void Form::onDisconnected()
     ui->pushButtonLoadRequestDikon->setEnabled(false);
     ui->pushButtonLoadRequestZhenya->setEnabled(false);
     ui->pushButtonGetF2->setEnabled(false);
+    ui->streamsButton->setEnabled(false);
 
     QMessageBox::information(this, "Разрыв соединения", "Сервер недоступен");
     m_progressBar->hide();
@@ -197,9 +204,9 @@ void Form::slotPlanFinished()
     m_labelStreamsPlanned->hide();
 }
 
-void Form::slotOffsetStream(QString strPassedStations, QString strOriginalDepartureTime, int NP, int hours)
+void Form::slotOffsetStream(int VP, int KP, int NP, int hours)
 {
-    DialogStreamOffset dialog(strPassedStations, strOriginalDepartureTime, NP, hours, this);
+    DialogStreamOffset dialog(VP, KP, NP, hours, this);
     int ok = dialog.exec();
     bool b_Accept = (bool)ok;
     QString message = QString("%1,%2")
@@ -236,4 +243,16 @@ void Form::createDocument(QByteArray &ba)
 {
     Document doc;
     doc.create(ba);
+}
+
+void Form::showStreamsDialog()
+{
+    StreamsDialog streamsDialog(this, m_client);
+    streamsDialog.exec();
+}
+
+void Form::showSettingsDialog()
+{
+    SettingsDialog settingsDialog(this);
+    settingsDialog.exec();
 }

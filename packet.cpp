@@ -45,7 +45,8 @@ Packet::Packet(QByteArray ba, const Type &t):
 {
     m_ba = ba;
     if((m_type != TYPE_NOT_DEFINED)&&(m_type != TYPE_QSTRING)&&(m_type != TYPE_STATION) && (m_type != TYPE_SECTION) &&
-            (m_type != TYPE_PVR) && (m_type != TYPE_REQUEST) && (m_type != TYPE_STREAM) && (m_type != TYPE_XML_F2)) {
+            (m_type != TYPE_PVR) && (m_type != TYPE_REQUEST) && (m_type != TYPE_STREAM) && (m_type != TYPE_XML_F2) &&
+            (m_type != TYPE_XML_STREAMS)) {
         qDebug() << "Wrong convert type";
         exit(1);
     }
