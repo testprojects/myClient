@@ -36,6 +36,8 @@ private slots:
     void createDocument(QByteArray &ba);
 
     void on_pushButtonGetF2_clicked();
+    void showStreamsDialog();
+    void showSettingsDialog();
 
 private:
     Ui::Form *ui;

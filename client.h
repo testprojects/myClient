@@ -42,6 +42,7 @@ signals:
     void signalPlanFinished();
     void signalOffsetStream(int VP, int KP, int NP, int hours);
     void signalF2Ready(QByteArray &ba);
+    void signalStreamsReady(QByteArray &ba);
 
 private:
     //сокет на запись

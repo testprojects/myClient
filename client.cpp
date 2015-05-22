@@ -62,7 +62,7 @@ void Client::sendMessage(const QString &message)
 
     m_tcpSocket->write(block);
     m_tcpSocket->flush();
-    qDebug() << "Sended message: " << block;
+    qDebug() << "Sended message: " << block << endl;
     qDebug() << "Block size    : " << (quint32)(block.size() - sizeof(quint32));
 }
 
@@ -94,30 +94,35 @@ void Client::readPacket()
         qDebug() << "block          : " << block;
 
         switch(type) {
-        case TYPE_QSTRING:
-        {
-            Packet pack(block, TYPE_QSTRING);
-            QString str = pack.decodeToQString();
-            emit stringRecieved(str);
-            break;
-        }
-        case TYPE_STATION:
-        {
-            Packet pack(block, TYPE_STATION);
-            Station st = pack.decodeToStation();
-            QString strStation = st.name + QString(" (%1)").arg(st.number);
-            emit stringRecieved(strStation);
-            break;
-        }
-        case TYPE_XML_F2:
-        {
-            emit signalF2Ready(block);
-            break;
-        }
-        default:
-        {
-            assert(0);
-        }
+            case TYPE_QSTRING:
+            {
+                Packet pack(block, TYPE_QSTRING);
+                QString str = pack.decodeToQString();
+                emit stringRecieved(str);
+                break;
+            }
+            case TYPE_STATION:
+            {
+                Packet pack(block, TYPE_STATION);
+                Station st = pack.decodeToStation();
+                QString strStation = st.name + QString(" (%1)").arg(st.number);
+                emit stringRecieved(strStation);
+                break;
+            }
+            case TYPE_XML_F2:
+            {
+                emit signalF2Ready(block);
+                break;
+            }
+            case TYPE_XML_STREAMS:
+            {
+                emit signalStreamsReady(block);
+                break;
+            }
+            default:
+            {
+                assert(0);
+            }
         }
 
         m_blockSize = 0;

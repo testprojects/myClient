@@ -16,7 +16,10 @@ SOURCES += main.cpp \
     widgetplanstream.cpp \
     dialogstreamoffset.cpp \
     dialogf2.cpp \
-    document.cpp
+    document.cpp \
+    streamsdialog.cpp \
+    gisclient.cpp \
+    settingsdialog.cpp
 #    ../plan/echelon.cpp \
 #    ../plan/mytime.cpp \
 #    ../plan/ps.cpp \
@@ -42,11 +45,16 @@ HEADERS += \
     widgetplanstream.h \
     dialogstreamoffset.h \
     dialogf2.h \
-    document.h
+    document.h \
+    streamsdialog.h \
+    gisclient.h \
+    settingsdialog.h
     ../plan/pauser.h
 
 FORMS += \
     form.ui \
     widgetplanstream.ui \
     dialogstreamoffset.ui \
-    dialogf2.ui
+    dialogf2.ui \
+    streamsdialog.ui \
+    settingsdialog.ui
