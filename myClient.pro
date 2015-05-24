@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     document.cpp \
     streamsdialog.cpp \
     gisclient.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    mainwindow.cpp
 #    ../plan/echelon.cpp \
 #    ../plan/mytime.cpp \
 #    ../plan/ps.cpp \
@@ -48,7 +49,8 @@ HEADERS += \
     document.h \
     streamsdialog.h \
     gisclient.h \
-    settingsdialog.h
+    settingsdialog.h \
+    mainwindow.h
     ../plan/pauser.h
 
 FORMS += \
@@ -57,4 +59,5 @@ FORMS += \
     dialogstreamoffset.ui \
     dialogf2.ui \
     streamsdialog.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    mainwindow.ui
