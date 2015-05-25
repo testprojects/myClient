@@ -21,11 +21,11 @@ private slots:
     void displayMessage(const QString &message);
     void onConnected();
     void onDisconnected();
+    void onConnectedDisableInterface();
+    void onConnectedEnableInterface();
 
 private slots:
     void on_pushButtonSendRequest_clicked();
-    void on_pushButtonLoadRequestDikon_clicked();
-    void on_pushButtonLoadRequestZhenya_clicked();
 
 private slots:
     void slotPausePlanning();
@@ -39,11 +39,21 @@ private slots:
     void slotOffsetStream(QString strPassedStations, QString strOriginalDepartureTime, int NP, int hours);
     void createDocument(QByteArray &ba);
 
-    void on_pushButtonGetF2_clicked();
-    void showStreamsDialog();
-    void showSettingsDialog();
+    void on_actionDBLoadRequestDikon_triggered();
 
-    void on_pushButtonConnect_clicked();
+    void on_actionDBLoadRequestZhenya_triggered();
+
+    void on_actionDBDeleteAllStreams_triggered();
+
+    void on_actionFormsF2_triggered();
+
+    void on_actionConnect_triggered();
+
+    void on_actionSettings_triggered();
+
+    void on_actionCacheOut_triggered();
+
+    void on_actionDisplayStreams_triggered();
 
 private:
     Client *m_client;

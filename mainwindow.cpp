@@ -8,11 +8,12 @@
 #include "document.h"
 #include "streamsdialog.h"
 #include "settingsdialog.h"
+#include "assert.h"
+#include "connecttoserverdialog.h"
 
 #include <QtWidgets>
 
-const QString SERVER_IP = "127.0.0.1";
-const quint16 SERVER_PORT = 1535;
+
 const int STRETCH = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     m_layoutProgress = new QVBoxLayout(this);
 
     m_progressBar = new QProgressBar(this);
@@ -34,11 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_layoutProgress->addWidget(m_labelStreamsPlanned);
     setLayout(m_layoutProgress);
 
-    ui->pushButtonSendRequest->setEnabled(false);
-    ui->pushButtonSendRequest->setEnabled(false);
-    ui->pushButtonLoadRequestDikon->setEnabled(false);
-    ui->pushButtonLoadRequestZhenya->setEnabled(false);
-    ui->pushButtonGetF2->setEnabled(false);
+    onConnectedDisableInterface();
+
     m_client = new Client(SERVER_IP, SERVER_PORT, this);
     connect(m_client, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(m_client, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
@@ -54,9 +53,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_client, SIGNAL(signalPausePlanning()), this, SLOT(slotPausePlanning()));
     connect(m_client, SIGNAL(signalContinuePlanning()), this, SLOT(slotContinuePlanning()));
     connect(m_client, SIGNAL(signalAbortPlanning(bool)), this, SLOT(slotAbortPlanning(bool)));
-
-    connect(ui->streamsButton, SIGNAL(clicked()), this, SLOT(showStreamsDialog()));
-    connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(showSettingsDialog()));
 }
 
 MainWindow::~MainWindow()
@@ -64,27 +60,44 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::onConnectedEnableInterface() {
+    ui->actionConnect->setText("Отключиться от сервера");
+    ui->actionConnect->setEnabled(true);
+    ui->actionConnect->setIcon(QIcon(":/resources/icon_disconnected_128.png"));
+
+    ui->pushButtonSendRequest->setEnabled(true);
+    ui->actionDBLoadRequestDikon->setEnabled(true);
+    ui->actionDBLoadRequestZhenya->setEnabled(true);
+    ui->actionFormsF2->setEnabled(true);
+    ui->actionDBDeleteAllStreams->setEnabled(true);
+    ui->actionCacheOut->setEnabled(true);
+    ui->actionDisplayStreams->setEnabled(true);
+}
+
+void MainWindow::onConnectedDisableInterface() {
+    ui->actionConnect->setText("Подключиться к серверу");
+    ui->actionConnect->setEnabled(true);
+    ui->actionConnect->setIcon(QIcon(":/resources/icon_connected_128.png"));
+    ui->pushButtonSendRequest->setEnabled(false);
+    ui->actionDBLoadRequestDikon->setEnabled(false);
+    ui->actionDBLoadRequestZhenya->setEnabled(false);
+    ui->actionFormsF2->setEnabled(false);
+    ui->actionDBDeleteAllStreams->setEnabled(false);
+    ui->actionCacheOut->setEnabled(false);
+    ui->actionDisplayStreams->setEnabled(false);
+}
+
 void MainWindow::onConnected()
 {
-    ui->pushButtonConnect->setText("Disconnect");
-    ui->pushButtonConnect->setEnabled(true);
-    ui->pushButtonSendRequest->setEnabled(true);
-    ui->pushButtonLoadRequestDikon->setEnabled(true);
-    ui->pushButtonLoadRequestZhenya->setEnabled(true);
-    ui->pushButtonGetF2->setEnabled(true);
-    ui->streamsButton->setEnabled(true);
+    ui->actionConnect->setText("Отключиться от сервера");
+    ui->actionConnect->setEnabled(true);
+
+    onConnectedEnableInterface();
 }
 
 void MainWindow::onDisconnected()
 {
-    ui->pushButtonConnect->setText("Connect");
-    ui->pushButtonConnect->setEnabled(true);
-    ui->pushButtonSendRequest->setEnabled(false);
-    ui->pushButtonLoadRequestDikon->setEnabled(false);
-    ui->pushButtonLoadRequestZhenya->setEnabled(false);
-    ui->pushButtonGetF2->setEnabled(false);
-    ui->streamsButton->setEnabled(false);
-
+    onConnectedDisableInterface();
     QMessageBox::information(this, "Разрыв соединения", "Сервер недоступен");
     m_progressBar->hide();
     m_labelStreamsPlanned->hide();
@@ -137,33 +150,6 @@ void MainWindow::displayMessage(const QString &message)
     qDebug() << "displayMessage: " << message;
 }
 
-void MainWindow::on_pushButtonLoadRequestDikon_clicked()
-{
-    QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Дикон)", QDir::home().path(), "Text *.txt");
-
-    if(!filePath.isEmpty()) {
-        QFile file(filePath);
-        file.open(QIODevice::ReadOnly);
-        QString data;
-        data = file.readAll();
-        QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_DIKON).arg(data);
-        m_client->sendMessage(strCommand);
-    }
-}
-
-void MainWindow::on_pushButtonLoadRequestZhenya_clicked()
-{
-    QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Женя)", QDir::home().path(), "*.fps");
-    if(!filePath.isEmpty()) {
-        QFile file(filePath);
-        file.open(QIODevice::ReadOnly);
-        QString data;
-        data = file.readAll();
-        QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_ZHENYA).arg(data);
-        m_client->sendMessage(strCommand);
-    }
-}
-
 void MainWindow::slotPlanStarted()
 {
     m_progressBar->setVisible(true);
@@ -203,7 +189,47 @@ void MainWindow::slotOffsetStream(QString strPassedStations, QString strOriginal
     m_client->sendMessage(message);
 }
 
-void MainWindow::on_pushButtonGetF2_clicked()
+
+void MainWindow::createDocument(QByteArray &ba)
+{
+    Document doc;
+    doc.create(ba);
+}
+
+void MainWindow::on_actionDBLoadRequestDikon_triggered()
+{
+    QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Дикон)", QDir::home().path(), "Text *.txt");
+
+    if(!filePath.isEmpty()) {
+        QFile file(filePath);
+        file.open(QIODevice::ReadOnly);
+        QString data;
+        data = file.readAll();
+        QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_DIKON).arg(data);
+        m_client->sendMessage(strCommand);
+    }
+}
+
+void MainWindow::on_actionDBLoadRequestZhenya_triggered()
+{
+    QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Женя)", QDir::home().path(), "*.fps");
+    if(!filePath.isEmpty()) {
+        QFile file(filePath);
+        file.open(QIODevice::ReadOnly);
+        QString data;
+        data = file.readAll();
+        QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_ZHENYA).arg(data);
+        m_client->sendMessage(strCommand);
+    }
+}
+
+void MainWindow::on_actionDBDeleteAllStreams_triggered()
+{
+    //вызов метода MyDB
+    m_client->sendMessage(QString::number(DB_REMOVE_ALL_STREAMS));
+}
+
+void MainWindow::on_actionFormsF2_triggered()
 {
     DialogF2 dialog;
     int res = dialog.exec();
@@ -227,33 +253,34 @@ void MainWindow::on_pushButtonGetF2_clicked()
     }
 }
 
-void MainWindow::createDocument(QByteArray &ba)
-{
-    Document doc;
-    doc.create(ba);
-}
-
-void MainWindow::showStreamsDialog()
-{
-    StreamsDialog streamsDialog(this, m_client);
-    streamsDialog.exec();
-}
-
-void MainWindow::showSettingsDialog()
-{
+void MainWindow::on_actionSettings_triggered() {
     SettingsDialog settingsDialog(this);
     settingsDialog.exec();
 }
 
-void MainWindow::on_pushButtonConnect_clicked()
+void MainWindow::on_actionConnect_triggered()
 {
-    qDebug() << "OnPushbuttonConnect";
-    if(ui->pushButtonConnect->text() == "Connect") {
-        ui->pushButtonConnect->setEnabled(false);
-        m_client->connectToServer();
+    if(!m_client->isConnected()) {
+        connectToServerDialog dialog;
+        int res = dialog.exec();
+        if(res == QDialog::Accepted) {
+            m_client->setServerIP(dialog.serverIP());
+            m_client->setServerPort(dialog.serverPort().toUInt());
+            ui->actionConnect->setEnabled(false);
+            m_client->connectToServer();
+        }
     }
     else {
-        ui->pushButtonConnect->setEnabled(false);
         m_client->disconnectFromServer();
     }
+}
+void MainWindow::on_actionCacheOut_triggered()
+{
+    m_client->sendMessage(QString::number(CACHE_OUT));
+}
+
+void MainWindow::on_actionDisplayStreams_triggered()
+{
+    StreamsDialog streamsDialog(this, m_client);
+    streamsDialog.exec();
 }

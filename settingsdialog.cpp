@@ -40,6 +40,11 @@ void SettingsDialog::writeSettings()
         settings.setValue("pathToProgram", ui->pathToProgramLineEdit->text().simplified());
         settings.setValue("pathToMap", ui->pathToMapLineEdit->text().simplified());
         settings.endGroup();
+
+        settings.beginGroup("Server");
+        settings.setValue("serverIP", ui->serverIPLineEdit->text());
+        settings.setValue("serverPort", ui->serverPortLineEdit->text());
+        settings.endGroup();
     }
 }
 
@@ -56,6 +61,11 @@ void SettingsDialog::readSettings()
     settings.beginGroup("Gis");
     ui->pathToProgramLineEdit->setText(QDir::toNativeSeparators(settings.value("pathToProgram", "").toString()));
     ui->pathToMapLineEdit->setText(QDir::toNativeSeparators(settings.value("pathToMap", "").toString()));
+    settings.endGroup();
+
+    settings.beginGroup("Server");
+    ui->serverIPLineEdit->setText(settings.value("serverIP").toString());
+    ui->serverPortLineEdit->setText(settings.value("serverPort").toString());
     settings.endGroup();
 }
 

@@ -6,11 +6,14 @@
 #include "../plan/pauser.h"
 #include <QMessageBox>
 
-const int CONNECTION_INTERVAL = 1000;
+//const int CONNECTION_INTERVAL = 1000;
+const int MAX_CONNECTION_TIME = 5000;
 
 Client::Client(QString serverIP, quint16 serverPort, QObject *parent):
     QObject(parent), m_serverIP(serverIP), m_serverPort(serverPort), m_blockSize(0)
 {
+    obstacleTime = new QTime();
+    connectTimer = new QTimer(this);
     m_tcpSocket = new QTcpSocket(this);
     connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(readPacket()));
     connect(m_tcpSocket, SIGNAL(connected()), this, SIGNAL(connected()));
@@ -20,22 +23,25 @@ Client::Client(QString serverIP, quint16 serverPort, QObject *parent):
 
 void Client::connectToServer()
 {
-    //что будет, если пытаться установить соединение, которое уже установлено?
-    QTimer *connectTimer = new QTimer(this);
-    connectTimer->setInterval(CONNECTION_INTERVAL);
-    connect(connectTimer, SIGNAL(timeout()), this, SLOT(tryToConnect()));
-    connect(m_tcpSocket, SIGNAL(connected()), connectTimer, SLOT(stop()));
+    connectTimer->setInterval(MAX_CONNECTION_TIME);
+    connectTimer->setSingleShot(true);
+
+    connect(connectTimer, SIGNAL(timeout()), this, SLOT(disconnectFromServer()));
+    connect(this, SIGNAL(connected()), connectTimer, SLOT(stop()));
+
     connectTimer->start();
+    m_tcpSocket->connectToHost(QHostAddress(m_serverIP), m_serverPort);
 }
 
 void Client::disconnectFromServer()
 {
-    m_tcpSocket->disconnectFromHost();
-}
-
-void Client::tryToConnect()
-{
-    m_tcpSocket->connectToHost(QHostAddress(m_serverIP), m_serverPort);
+    if(!isConnected()) {
+        m_tcpSocket->abort();
+        emit disconnected();
+    }
+    else {
+        m_tcpSocket->disconnectFromHost();
+    }
 }
 
 bool Client::isConnected() const
@@ -184,4 +190,20 @@ void Client::dispatchMessage(QString message)
     else if(message.startsWith("REQUESTS_ADDED")) {
         qDebug() << "Requests added to server";
     }
+}
+
+void Client::setServerIP(QString serverIP) {
+    m_serverIP = serverIP;
+}
+
+QString Client::serverIP() {
+    return m_serverIP;
+}
+
+void Client::setServerPort(quint16 port) {
+    m_serverPort = port;
+}
+
+quint16 Client::serverPort() {
+    return m_serverPort;
 }

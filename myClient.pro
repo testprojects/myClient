@@ -11,7 +11,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     client.cpp \
-    form.cpp \
     packet.cpp \
     widgetplanstream.cpp \
     dialogstreamoffset.cpp \
@@ -20,7 +19,8 @@ SOURCES += main.cpp \
     streamsdialog.cpp \
     gisclient.cpp \
     settingsdialog.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    connecttoserverdialog.cpp
 #    ../plan/echelon.cpp \
 #    ../plan/mytime.cpp \
 #    ../plan/ps.cpp \
@@ -32,7 +32,6 @@ SOURCES += main.cpp \
 
 HEADERS += \
     client.h \
-    form.h \
     packet.h \
     types.h \
 #    ../plan/echelon.h \
@@ -50,14 +49,18 @@ HEADERS += \
     streamsdialog.h \
     gisclient.h \
     settingsdialog.h \
-    mainwindow.h
+    mainwindow.h \
+    connecttoserverdialog.h
     ../plan/pauser.h
 
 FORMS += \
-    form.ui \
     widgetplanstream.ui \
     dialogstreamoffset.ui \
     dialogf2.ui \
     streamsdialog.ui \
     settingsdialog.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    connecttoserverdialog.ui
+
+RESOURCES += \
+    resources.qrc
