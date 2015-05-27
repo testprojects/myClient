@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->toolButtonPause->setDefaultAction(ui->actionActionPauseResume);
     ui->toolButtonPause->setVisible(false);
     ui->progressBar->setVisible(false);
     ui->labelStreams->setVisible(false);
@@ -36,13 +37,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_client, SIGNAL(signalOffsetStream(QString, QString, int, int)), this, SLOT(slotOffsetStream(QString, QString, int, int)));
     connect(m_client, SIGNAL(signalF2Ready(QByteArray&)), this, SLOT(createDocument(QByteArray&)));
 
-    connect(m_client, SIGNAL(signalPausePlanning()), this, SLOT(slotPausePlanning()));
-    connect(m_client, SIGNAL(signalContinuePlanning()), this, SLOT(slotResumePlanning()));
-    connect(m_client, SIGNAL(signalAbortPlanning(bool)), this, SLOT(slotAbortPlanning(bool)));
+//    connect(m_client, SIGNAL(signalPausePlanning()), this, SLOT(slotPausePlanning()));
+//    connect(m_client, SIGNAL(signalContinuePlanning()), this, SLOT(slotResumePlanning()));
+//    connect(m_client, SIGNAL(signalAbortPlanning(bool)), this, SLOT(slotAbortPlanning(bool)));
 
     connect(m_client, SIGNAL(signalPlanPaused()), this, SLOT(slotPlanPaused()));
     connect(m_client, SIGNAL(signalPlanResumed()), this, SLOT(slotPlanResumed()));
     connect(m_client, SIGNAL(signalPlanAborted()), this, SLOT(slotPlanAborted()));
+    connect(m_client, SIGNAL(signalPlanFailed(QString)), this, SLOT(slotPlanFailed(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -99,16 +101,15 @@ void MainWindow::onDisconnected()
 }
 
 void MainWindow::slotPausePlanning() {
-    qDebug() << "MainwWindow::slotPausePlanning()";
-    ui->toolButtonPause->setVisible(true);
-    ui->labelStreams->setVisible(true);
-    ui->progressBar->setVisible(true);
-    QString message = QString::fromUtf8("%1").arg(PAUSE_PLANNING);
+    QString message = QString::fromUtf8("%1")
+            .arg(PAUSE_PLANNING);
     m_client->sendMessage(message);
 }
 
-void MainWindow::slotResumePlanning() {
-    QString message = QString::fromUtf8("%1").arg(CONTINUE_PLANNING);
+void MainWindow::slotResumePlanning(bool bResume) {
+    QString message = QString::fromUtf8("%1,%2")
+            .arg(RESUME_PLANNING)
+            .arg(bResume? "YES" : "NO");
     m_client->sendMessage(message);
 }
 
@@ -172,16 +173,42 @@ void MainWindow::slotPlanFinished()
 }
 
 void MainWindow::slotPlanPaused() {
+    m_state = PAUSED;
+    ui->statusbar->showMessage("Планирование приостановлено...");
     ui->toolButtonPause->setIcon(QIcon(":/resources/icon_resume_128"));
 }
 
 void MainWindow::slotPlanResumed() {
+    m_state = PLANNING;
+    ui->statusbar->showMessage("Планирование потоков...");
     ui->toolButtonPause->setIcon(QIcon(":/resources/icon_pause_128"));
 }
 
 void MainWindow::slotPlanAborted() {
-    //может стоит добавить что-то ещё для того, чтобы различать незавершённое планирование
-    slotPlanFinished();
+    m_state = PAUSED;
+    int iSaveChanges = QMessageBox::warning(NULL, QString::fromUtf8("Сохранить спланированныые потоки в БД?"),
+                                             QString::fromUtf8("Сохранить спланированныые потоки в БД?"), QMessageBox::Yes, QMessageBox::No);
+    if(iSaveChanges == QMessageBox::Yes) {
+        slotAbortPlanning(true);
+    }
+    else {
+        slotAbortPlanning(false);
+    }
+    //прекратить планирование
+//    slotPlanFinished();
+}
+
+void MainWindow::slotPlanFailed(QString msg) {
+    m_state = PAUSED;
+    int answer;
+    answer = QMessageBox::warning(this, QString::fromUtf8("Поток не спланирован"), msg, QMessageBox::Yes, QMessageBox::No);
+    if(answer == QMessageBox::Yes) {
+        //продолжить планирование
+        slotResumePlanning(true);
+    }
+    else {
+        slotResumePlanning(false);
+    }
 }
 
 void MainWindow::slotStreamPlanned(int count, int amount)
@@ -310,7 +337,7 @@ void MainWindow::on_actionActionPauseResume_triggered()
     if(m_state == PLANNING)
         slotPausePlanning();
     else if(m_state == PAUSED)
-        slotResumePlanning();
+        slotResumePlanning(true);
     else if(m_state == NOT_PLANNING) {
         qDebug() << "how could be paused/resumed, while not planning?";
         return;

@@ -31,7 +31,7 @@ private slots:
 
 private slots:
     void slotPausePlanning();
-    void slotResumePlanning();
+    void slotResumePlanning(bool bResume);
     void slotAbortPlanning(bool bSavePlannedThreads = true);
 
 
@@ -40,6 +40,7 @@ private slots:
     void slotPlanPaused();
     void slotPlanResumed();
     void slotPlanAborted();
+    void slotPlanFailed(QString msg);
 
     void slotStreamPlanned(int count, int amount);
     void slotStreamsFailed(int count);
@@ -67,6 +68,6 @@ private slots:
 private:
     Client *m_client;
     Ui::MainWindow *ui;
-    planning_state m_state;
+    planning_state m_state;//состояние потока планирования
 };
 

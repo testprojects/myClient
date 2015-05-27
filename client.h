@@ -41,14 +41,14 @@ private slots:
     void dispatchMessage(QString message);
 
 signals:
-    void signalPausePlanning();
-    void signalAbortPlanning(bool bSavePlannedStreams = true);
-    void signalContinuePlanning();
+//    void signalPausePlanning();
+//    void signalAbortPlanning(bool bSavePlannedStreams = true);
+//    void signalContinuePlanning();
 
     void signalPlanPaused();
     void signalPlanResumed();
     void signalPlanAborted();
-
+    void signalPlanFailed(QString);
 
     void signalPlanStarted();
     void signalPlanned(int count, int amount);

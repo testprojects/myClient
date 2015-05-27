@@ -43,6 +43,12 @@
        <property name="text">
         <string>...</string>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
       </widget>
      </item>
      <item row="2" column="1">
@@ -136,8 +142,16 @@
      <addaction name="action_11"/>
      <addaction name="action_17"/>
     </widget>
+    <widget class="QMenu" name="menu_10">
+     <property name="title">
+      <string>Форма 10</string>
+     </property>
+     <addaction name="action"/>
+     <addaction name="action_5"/>
+    </widget>
     <addaction name="menu_8"/>
     <addaction name="menu_9"/>
+    <addaction name="menu_10"/>
     <addaction name="action_6"/>
    </widget>
    <addaction name="menu"/>
@@ -340,6 +354,16 @@
    </property>
   </action>
   <action name="action_17">
+   <property name="text">
+    <string>для ЕС ЭВМ</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>для ПК</string>
+   </property>
+  </action>
+  <action name="action_5">
    <property name="text">
     <string>для ЕС ЭВМ</string>
    </property>

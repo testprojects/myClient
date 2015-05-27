@@ -59,6 +59,7 @@ Client::~Client()
 
 void Client::sendMessage(const QString &message)
 {
+    qDebug() << "Sended message: " << message;
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_0);
@@ -69,8 +70,7 @@ void Client::sendMessage(const QString &message)
 
     m_tcpSocket->write(block);
     m_tcpSocket->flush();
-    qDebug() << "Sended message: " << block << endl;
-    qDebug() << "Block size    : " << (quint32)(block.size() - sizeof(quint32));
+
 }
 
 void Client::readPacket()
@@ -170,29 +170,20 @@ void Client::dispatchMessage(QString message)
         emit signalOffsetStream(strPassedStations, strDepartureTime, NP, hours);
     }
     else if(message.startsWith("STREAM_PLAN_FAILED")){
-        //приостанавливаем планирование
-        emit signalPausePlanning();
-
+        //планирование уже приостановлено
         message.remove(0, QString::fromUtf8("STREAM_PLAN_FAILED(").length());
         message.chop(1);
         message.append(QString::fromUtf8(". Продолжить планирование?"));
-        int answer;
-        answer = QMessageBox::warning(NULL, QString::fromUtf8("Поток не спланирован"), message, QMessageBox::Yes, QMessageBox::No);
-        if(answer == QMessageBox::Yes) {
-            //продолжить планирование
-            emit signalContinuePlanning();
-        }
-        else {
-            int iSaveChanges = QMessageBox::warning(NULL, QString::fromUtf8("Сохранить спланированныые потоки в БД?"),
-                                                     QString::fromUtf8("Сохранить спланированныые потоки в БД?"), QMessageBox::Yes, QMessageBox::No);
-            if(iSaveChanges == QMessageBox::Yes) {
-                emit signalAbortPlanning(true);
-            }
-            else {
-                emit signalAbortPlanning(false);
-            }
-            //прекратить планирование
-        }
+        emit signalPlanFailed(message);
+    }
+    else if(message.startsWith("PLAN_PAUSED")) {
+        emit signalPlanPaused();
+    }
+    else if(message.startsWith("PLAN_ABORTED")) {
+        emit signalPlanAborted();
+    }
+    else if(message.startsWith("PLAN_RESUMED")) {
+        emit signalPlanResumed();
     }
     else if(message.startsWith("REQUESTS_ADDED")) {
         qDebug() << "Requests added to server";
