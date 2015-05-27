@@ -9,6 +9,8 @@ namespace Ui {
 class MainWindow;
 }
 
+enum planning_state{PLANNING, PAUSED, NOT_PLANNING};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -29,13 +31,18 @@ private slots:
 
 private slots:
     void slotPausePlanning();
-    void slotContinuePlanning();
+    void slotResumePlanning();
     void slotAbortPlanning(bool bSavePlannedThreads = true);
 
+
     void slotPlanStarted();
+    void slotPlanFinished();
+    void slotPlanPaused();
+    void slotPlanResumed();
+    void slotPlanAborted();
+
     void slotStreamPlanned(int count, int amount);
     void slotStreamsFailed(int count);
-    void slotPlanFinished();
     void slotOffsetStream(QString strPassedStations, QString strOriginalDepartureTime, int NP, int hours);
     void createDocument(QByteArray &ba);
 
@@ -45,7 +52,7 @@ private slots:
 
     void on_actionDBDeleteAllStreams_triggered();
 
-    void on_actionFormsF2_triggered();
+    void on_actionFormsF2PC_triggered();
 
     void on_actionConnect_triggered();
 
@@ -55,13 +62,11 @@ private slots:
 
     void on_actionDisplayStreams_triggered();
 
+    void on_actionActionPauseResume_triggered();
+
 private:
     Client *m_client;
     Ui::MainWindow *ui;
-
-    QProgressBar *m_progressBar;
-    QLabel *m_labelStreamsPlanned;
-    QVBoxLayout *m_layoutProgress;
-
+    planning_state m_state;
 };
 

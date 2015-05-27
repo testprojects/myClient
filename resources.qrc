@@ -4,5 +4,7 @@
         <file>resources/icon_disconnected_128.png</file>
         <file>resources/icon_settings_128.png</file>
         <file>resources/icon_map_128.png</file>
+        <file>resources/icon_pause_128.png</file>
+        <file>resources/icon_resume_128.png</file>
     </qresource>
 </RCC>

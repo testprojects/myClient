@@ -38,14 +38,16 @@ signals:
     void signalFailedConnection();
     void stringRecieved(QString);
 private slots:
-    //слот, который пытается подключиться через интервалы времени
-//    void tryToConnect();
     void dispatchMessage(QString message);
 
 signals:
     void signalPausePlanning();
     void signalAbortPlanning(bool bSavePlannedStreams = true);
     void signalContinuePlanning();
+
+    void signalPlanPaused();
+    void signalPlanResumed();
+    void signalPlanAborted();
 
 
     void signalPlanStarted();

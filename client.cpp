@@ -183,7 +183,14 @@ void Client::dispatchMessage(QString message)
             emit signalContinuePlanning();
         }
         else {
-            emit signalAbortPlanning();
+            int iSaveChanges = QMessageBox::warning(NULL, QString::fromUtf8("Сохранить спланированныые потоки в БД?"),
+                                                     QString::fromUtf8("Сохранить спланированныые потоки в БД?"), QMessageBox::Yes, QMessageBox::No);
+            if(iSaveChanges == QMessageBox::Yes) {
+                emit signalAbortPlanning(true);
+            }
+            else {
+                emit signalAbortPlanning(false);
+            }
             //прекратить планирование
         }
     }
