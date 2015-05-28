@@ -52,6 +52,22 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent *) {
+    if(m_client->isConnected()) {
+        int answer = QMessageBox::question(this, "Сервер", "Отключить сервер при выходе из программы?", QMessageBox::Yes, QMessageBox::No);
+        if (answer == QMessageBox::Yes) {
+            //посылаем серверу команду на отключение
+            m_client->sendMessage(QString("%1").arg(CLOSE_SERVER));
+            qDebug() << "closing server...";
+        }
+        else if(answer == QMessageBox::No) {
+            //просто выходим
+            qDebug() << "not closing server...";
+        }
+    }
+    return;
+}
+
 void MainWindow::onConnectedEnableInterface() {
     ui->actionConnect->setText("Отключиться от сервера");
     ui->actionConnect->setEnabled(true);
