@@ -3,7 +3,6 @@
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QFile>
 #include <QtXml/QDomDocument>
-//#include <QtWidgets/QMessageBox>
 #include <QDebug>
 
 Document::Document() : rootDomDocument(0)
@@ -18,7 +17,7 @@ Document::~Document()
 bool Document::openTemplate()
 {
     rootDomDocument = new QDomDocument;
-    QFile file("ppz.xml");
+    QFile file(":/resources/template_document/ppz.xml");
     if(!file.open(QIODevice::ReadOnly)) {
         qDebug() << "error read file template";
         return false;

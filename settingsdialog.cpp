@@ -11,6 +11,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // control input data
+    ui->serverIPLineEdit->setValidator(new QRegExpValidator(QRegExp("^(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$")));
+    ui->serverPortLineEdit->setValidator(new QIntValidator(0, 9999));
+
     readSettings();
 
     connect(ui->saveButton, SIGNAL(clicked()), SLOT(writeSettings()));

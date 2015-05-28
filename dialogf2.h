@@ -29,7 +29,7 @@ public:
     QString okr;
 private slots:
     void on_buttonBox_accepted();
-    void on_checkBox_OKR_stateChanged(int arg1);
+//    void on_checkBox_OKR_stateChanged(int arg1);
     void on_lineEdit_VP_Start_textChanged(const QString &arg1);
 };
 

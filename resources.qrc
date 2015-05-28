@@ -6,5 +6,6 @@
         <file>resources/icon_map_128.png</file>
         <file>resources/icon_pause_128.png</file>
         <file>resources/icon_resume_128.png</file>
+        <file>resources/template_document/ppz.xml</file>
     </qresource>
 </RCC>

@@ -1,12 +1,17 @@
 #include "connecttoserverdialog.h"
 #include "ui_connecttoserverdialog.h"
 #include <QSettings>
+#include <QDebug>
 
 connectToServerDialog::connectToServerDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::connectToServerDialog)
 {
     ui->setupUi(this);
+
+    // control input data
+    ui->lineEditIP->setValidator(new QRegularExpressionValidator(QRegularExpression("^(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$")));
+    ui->lineEditPort->setValidator(new QIntValidator(0, 9999));
 
     QSettings settings;
     settings.beginGroup("Server");
@@ -33,6 +38,7 @@ void connectToServerDialog::on_pushButtonConnect_clicked()
 {
     m_serverIP = ui->lineEditIP->text();
     m_serverPort = ui->lineEditPort->text();
+    qDebug() << m_serverIP << m_serverPort;
     QSettings settings;
     settings.beginGroup("Server");
     settings.setValue("serverIP", m_serverIP);
