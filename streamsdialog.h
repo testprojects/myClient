@@ -31,6 +31,7 @@ class StreamsDialog : public QDialog
     private slots:
         void getStreams(QByteArray&);
         void displayStream();
+        void displayAllStreams();
         void sendRequest();
         void enableButton();
         void connectToGis();
