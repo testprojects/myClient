@@ -32,6 +32,7 @@ StreamsDialog::StreamsDialog(QWidget *parent, Client *client) :
     connect(this->client, SIGNAL(signalStreamsReady(QByteArray&)), this, SLOT(getStreams(QByteArray&)));
     connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui->displayStreamButton, SIGNAL(clicked()), this, SLOT(displayStream()));
+    connect(ui->displayAllStreamsButton, SIGNAL(clicked()), this, SLOT(displayAllStreams()));
     connect(ui->refreshButton, SIGNAL(clicked()), this, SLOT(sendRequest()));
     connect(selectionModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(enableButton()));
     connect(ui->openGisButton, SIGNAL(clicked()), SLOT(runGis()));
@@ -61,6 +62,16 @@ void StreamsDialog::displayStream()
                         .arg(streamsModel->item(curRow, 0)->text())
                         .arg(streamsModel->item(curRow, 1)->text())
                         .arg(streamsModel->item(curRow, 2)->text())
+                        .arg(settings.value("Gis/pathToMap").toString()));
+}
+
+void StreamsDialog::displayAllStreams()
+{
+    QSettings settings;
+
+    //    gisClient->createObject();
+    client->sendMessage(QString("%1,%2")
+                        .arg(DISPLAY_ALL_STREAMS)
                         .arg(settings.value("Gis/pathToMap").toString()));
 }
 
@@ -102,6 +113,7 @@ void StreamsDialog::enableButton()
 {
     ui->displayStreamButton->setEnabled((process && process->state()) && selectionModel->hasSelection());
     ui->openGisButton->setEnabled((process && !process->state()) || (!process));
+    ui->displayAllStreamsButton->setEnabled((process && process->state()));
 }
 
 void StreamsDialog::runGis()
