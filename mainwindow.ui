@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>417</width>
+    <height>213</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>401</width>
+      <height>96</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="1">
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QPushButton" name="pushButtonSendRequest">
+       <property name="text">
+        <string>Спланировать поток (СУЗ)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QToolButton" name="toolButtonPause">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="labelStreams">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>417</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Работа с БД</string>
+    </property>
+    <widget class="QMenu" name="menu_2">
+     <property name="title">
+      <string>Заявки</string>
+     </property>
+     <addaction name="actionDBLoadRequestDikon"/>
+     <addaction name="actionDBLoadRequestZhenya"/>
+     <addaction name="separator"/>
+     <addaction name="action_15"/>
+     <addaction name="action_16"/>
+    </widget>
+    <widget class="QMenu" name="menu_4">
+     <property name="title">
+      <string>Потоки</string>
+     </property>
+     <addaction name="actionDBDeleteAllStreams"/>
+     <addaction name="actionCacheOut"/>
+    </widget>
+    <widget class="QMenu" name="menu_5">
+     <property name="title">
+      <string>Станции</string>
+     </property>
+     <addaction name="action_2"/>
+     <addaction name="action_3"/>
+     <addaction name="action_4"/>
+    </widget>
+    <widget class="QMenu" name="menu_6">
+     <property name="title">
+      <string>Участки</string>
+     </property>
+     <addaction name="action_8"/>
+     <addaction name="action_9"/>
+     <addaction name="action_10"/>
+    </widget>
+    <widget class="QMenu" name="menu_7">
+     <property name="title">
+      <string>ПВР</string>
+     </property>
+     <addaction name="action_12"/>
+     <addaction name="action_13"/>
+     <addaction name="action_14"/>
+    </widget>
+    <addaction name="menu_2"/>
+    <addaction name="menu_4"/>
+    <addaction name="menu_5"/>
+    <addaction name="menu_6"/>
+    <addaction name="menu_7"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>Сформировать документ</string>
+    </property>
+    <widget class="QMenu" name="menu_8">
+     <property name="title">
+      <string>Форма 2</string>
+     </property>
+     <addaction name="actionFormsF2PC"/>
+     <addaction name="action_7"/>
+    </widget>
+    <widget class="QMenu" name="menu_9">
+     <property name="title">
+      <string>Форма 2А</string>
+     </property>
+     <addaction name="action_11"/>
+     <addaction name="action_17"/>
+    </widget>
+    <widget class="QMenu" name="menu_10">
+     <property name="title">
+      <string>Форма 10</string>
+     </property>
+     <addaction name="action"/>
+     <addaction name="action_5"/>
+    </widget>
+    <addaction name="menu_8"/>
+    <addaction name="menu_9"/>
+    <addaction name="menu_10"/>
+    <addaction name="action_6"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_3"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionConnect"/>
+   <addaction name="actionDisplayStreams"/>
+   <addaction name="separator"/>
+   <addaction name="actionSettings"/>
+   <addaction name="separator"/>
+  </widget>
+  <action name="actionDBLoadRequestDikon">
+   <property name="text">
+    <string>Загрузить заявку с ПК (Дикон)</string>
+   </property>
+  </action>
+  <action name="actionDBLoadRequestZhenya">
+   <property name="text">
+    <string>Загрузить заявку с ПК (Женя)</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Графоплан</string>
+   </property>
+  </action>
+  <action name="actionDBDeleteAllStreams">
+   <property name="text">
+    <string>Удалить все потоки</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/icon_disconnected_128.png</normaloff>
+     <normalon>:/resources/icon_connected_128.png</normalon>
+     <disabledoff>:/resources/icon_disconnected_128.png</disabledoff>
+     <disabledon>:/resources/icon_connected_128.png</disabledon>
+     <activeoff>:/resources/icon_connected_128.png</activeoff>:/resources/icon_disconnected_128.png</iconset>
+   </property>
+   <property name="text">
+    <string>Подключиться к серверу</string>
+   </property>
+   <property name="toolTip">
+    <string>Подключиться к серверу</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/icon_settings_128.png</normaloff>:/resources/icon_settings_128.png</iconset>
+   </property>
+   <property name="text">
+    <string>Настройки</string>
+   </property>
+   <property name="toolTip">
+    <string>Настройки</string>
+   </property>
+  </action>
+  <action name="actionCacheOut">
+   <property name="text">
+    <string>Сохранить спланированные потоки в БД</string>
+   </property>
+  </action>
+  <action name="actionDisplayStreams">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/icon_map_128.png</normaloff>:/resources/icon_map_128.png</iconset>
+   </property>
+   <property name="text">
+    <string>ГИС</string>
+   </property>
+   <property name="toolTip">
+    <string>ГИС</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Создать</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Редактировать</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Удалить</string>
+   </property>
+  </action>
+  <action name="action_8">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Создать</string>
+   </property>
+  </action>
+  <action name="action_9">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Редактировать</string>
+   </property>
+  </action>
+  <action name="action_10">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Удалить</string>
+   </property>
+  </action>
+  <action name="action_12">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Создать</string>
+   </property>
+  </action>
+  <action name="action_13">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Редактировать</string>
+   </property>
+  </action>
+  <action name="action_14">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Удалить</string>
+   </property>
+  </action>
+  <action name="action_15">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Редактировать</string>
+   </property>
+  </action>
+  <action name="action_16">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Удалить</string>
+   </property>
+  </action>
+  <action name="actionActionPauseResume">
+   <property name="text">
+    <string>Пауза</string>
+   </property>
+   <property name="toolTip">
+    <string>Пауза/Возобновление</string>
+   </property>
+  </action>
+  <action name="actionFormsF2PC">
+   <property name="text">
+    <string>для ПК</string>
+   </property>
+  </action>
+  <action name="action_7">
+   <property name="text">
+    <string>для ЕС ЭВМ</string>
+   </property>
+  </action>
+  <action name="action_11">
+   <property name="text">
+    <string>для ПК</string>
+   </property>
+  </action>
+  <action name="action_17">
+   <property name="text">
+    <string>для ЕС ЭВМ</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>для ПК</string>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string>для ЕС ЭВМ</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

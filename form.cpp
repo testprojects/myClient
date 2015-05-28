@@ -48,8 +48,12 @@ Form::Form(QWidget *parent) :
     connect(m_client, SIGNAL(signalPlanned(int,int)), this, SLOT(slotStreamPlanned(int,int)));
     connect(m_client, SIGNAL(signalStreamsFailed(int)), this, SLOT(slotStreamsFailed(int)));
     connect(m_client, SIGNAL(signalPlanFinished()), this, SLOT(slotPlanFinished()));
-    connect(m_client, SIGNAL(signalOffsetStream(int, int, int, int)), this, SLOT(slotOffsetStream(int, int, int, int)));
+    connect(m_client, SIGNAL(signalOffsetStream(QString, QString, int, int)), this, SLOT(slotOffsetStream(QString, QString, int, int)));
     connect(m_client, SIGNAL(signalF2Ready(QByteArray&)), this, SLOT(createDocument(QByteArray&)));
+
+    connect(m_client, SIGNAL(signalPausePlanning()), this, SLOT(slotPausePlanning()));
+    connect(m_client, SIGNAL(signalContinuePlanning()), this, SLOT(slotContinuePlanning()));
+    connect(m_client, SIGNAL(signalAbortPlanning(bool)), this, SLOT(slotAbortPlanning(bool)));
 
     connect(ui->streamsButton, SIGNAL(clicked()), this, SLOT(showStreamsDialog()));
     connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(showSettingsDialog()));
@@ -98,6 +102,21 @@ void Form::onDisconnected()
     m_labelStreamsPlanned->hide();
 }
 
+void Form::slotPausePlanning() {
+    QString message = QString::fromUtf8("PAUSE_PLANNING");
+    m_client->sendMessage(message);
+}
+
+void Form::slotContinuePlanning() {
+    QString message = QString::fromUtf8("CONTINUE_PLANNING");
+    m_client->sendMessage(message);
+}
+
+void Form::slotAbortPlanning(bool bSavePlannedThreads) {
+    QString message = QString::fromUtf8("ABORT_PLANNING,%1")
+            .arg(bSavePlannedThreads? "YES": "NO");
+    m_client->sendMessage(message);
+}
 
 void Form::on_pushButtonSendRequest_clicked()
 {
@@ -185,9 +204,9 @@ void Form::slotPlanFinished()
     m_labelStreamsPlanned->hide();
 }
 
-void Form::slotOffsetStream(int VP, int KP, int NP, int hours)
+void Form::slotOffsetStream(QString strPassedStations, QString strOriginalDepartureTime, int NP, int hours)
 {
-    DialogStreamOffset dialog(VP, KP, NP, hours, this);
+    DialogStreamOffset dialog(strPassedStations, strOriginalDepartureTime, NP, hours);
     int ok = dialog.exec();
     bool b_Accept = (bool)ok;
     QString message = QString("%1,%2")

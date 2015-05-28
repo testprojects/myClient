@@ -28,11 +28,15 @@ private slots:
     void on_pushButtonLoadRequestZhenya_clicked();
 
 private slots:
+    void slotPausePlanning();
+    void slotContinuePlanning();
+    void slotAbortPlanning(bool bSavePlannedThreads = true);
+
     void slotPlanStarted();
     void slotStreamPlanned(int count, int amount);
     void slotStreamsFailed(int count);
     void slotPlanFinished();
-    void slotOffsetStream(int VP, int KP, int NP, int hours);
+    void slotOffsetStream(QString strPassedStations, QString strOriginalDepartureTime, int NP, int hours);
     void createDocument(QByteArray &ba);
 
     void on_pushButtonGetF2_clicked();

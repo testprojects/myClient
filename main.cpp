@@ -2,6 +2,7 @@
 #include <QTimer>
 #include <QtCore/QTextCodec>
 #include "form.h"
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,7 +15,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("GVC");
     QCoreApplication::setApplicationName("myClient");
 
-    Form form;
-    form.show();
+    MainWindow windows;
+    windows.show();
     return a.exec();
 }
