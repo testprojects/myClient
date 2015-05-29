@@ -12,6 +12,10 @@
 #include "connecttoserverdialog.h"
 #include <QtWidgets>
 
+#include <string>
+#include <iostream>
+#include <fstream>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow), m_state(NOT_PLANNING)
@@ -267,7 +271,7 @@ void MainWindow::on_actionDBLoadRequestDikon_triggered()
         QFile file(filePath);
         file.open(QIODevice::ReadOnly);
         QString data;
-        data = file.readAll();
+        data = file.readAll().trimmed();
         QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_DIKON).arg(data);
         m_client->sendMessage(strCommand);
     }
@@ -275,13 +279,31 @@ void MainWindow::on_actionDBLoadRequestDikon_triggered()
 
 void MainWindow::on_actionDBLoadRequestZhenya_triggered()
 {
+    //путь к файлу не должен включать русских букв - UTF8 не может перекодировать их в CP1251
     QString filePath =  QFileDialog::getOpenFileName(this, "Загрузить заявку (Женя)", QDir::home().path(), "*.fps");
     if(!filePath.isEmpty()) {
-        QFile file(filePath);
-        file.open(QIODevice::ReadOnly);
-        QString data;
-        data = file.readAll();
-        QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_ZHENYA).arg(data);
+        QTextCodec* codec = QTextCodec::codecForName("CP1251");
+        if (!codec) {
+            qDebug() << "No codec CP1251";
+            return;
+        }
+        std::ifstream input(filePath.toStdString().c_str());
+        if(!input) {
+            QMessageBox::warning(this, "Ошибка в пути к файлу" , "Путь к файлу заявок не должен содержать русских букв", QMessageBox::Ok);
+            return;
+        }
+        std::string line;
+        QString strRequest;
+        while( std::getline(input, line)) {
+            QString unicodeString = codec->toUnicode(line.c_str());
+            if(!strRequest.isEmpty()) {
+                strRequest.append(unicodeString);
+                strRequest.append("\n");
+            }
+        }
+        strRequest = strRequest.trimmed();
+        QString strCommand = QString("%1,%2").arg(LOAD_REQUEST_ZHENYA).arg(strRequest);
+        qDebug() << strCommand;
         m_client->sendMessage(strCommand);
     }
 }
@@ -344,6 +366,20 @@ void MainWindow::on_actionCacheOut_triggered()
 
 void MainWindow::on_actionDisplayStreams_triggered()
 {
+    QSettings settings;
+    settings.beginGroup("Gis");
+    QString pathProgramm = settings.value("pathToProgram").toString();
+    QString pathMap = settings.value("pathToMap").toString();
+    settings.endGroup();
+
+    if(pathProgramm.isEmpty()) {
+        QMessageBox::warning(this, "ГИС", "Укажите путь к исполняемому файлу ГИС в настройках");
+        return;
+    }
+    if(pathMap.isEmpty()) {
+        QMessageBox::warning(this, "ГИС", "Укажите путь к стандартной карте ГИС в настройках");
+        return;
+    }
     StreamsDialog streamsDialog(this, m_client);
     streamsDialog.exec();
 }
