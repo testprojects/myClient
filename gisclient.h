@@ -12,8 +12,7 @@ class GisClient : public QObject
         explicit GisClient(QObject *parent = 0);
         ~GisClient();
 
-        void loadMap();
-        void createObject();
+        void createObject(int, int, int, const QStringList&);
         void removeData();
 
     private:
@@ -21,15 +20,17 @@ class GisClient : public QObject
 
         QTcpSocket *tcpSocket;
         quint16 blockSize;
-        QString fileMap;
 
     private slots:
         void printError(QAbstractSocket::SocketError);
         void printReadData();
+        void getMap();
+        void loadMap();
 
     signals:
         void connected();
         void error(const QString&);
+        void mapReady(const QStringList&);
 };
 
 #endif // GISCLIENT_H

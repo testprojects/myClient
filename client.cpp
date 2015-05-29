@@ -126,6 +126,11 @@ void Client::readPacket()
                 emit signalStreamsReady(block);
                 break;
             }
+            case TYPE_XML_STREAM_COORDINATS:
+            {
+                emit signalStreamCoordinatsReady(block);
+                break;
+            }
             default:
             {
                 assert(0);

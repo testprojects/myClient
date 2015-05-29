@@ -9,6 +9,8 @@
 #include <QtCore/QProcess>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QInputDialog>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 
@@ -25,17 +27,23 @@ StreamsDialog::StreamsDialog(QWidget *parent, Client *client) :
     selectionModel = new QItemSelectionModel(streamsModel);
     ui->tableView->setModel(streamsModel);
     ui->tableView->setSelectionModel(selectionModel);
-    process = 0;
 
     sendRequest();
 
+    gisClient = new GisClient(this);
+
     connect(this->client, SIGNAL(signalStreamsReady(QByteArray&)), this, SLOT(getStreams(QByteArray&)));
+    connect(this->client, SIGNAL(signalStreamCoordinatsReady(QByteArray&)), this, SLOT(displayStream(QByteArray&)));
     connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
-    connect(ui->displayStreamButton, SIGNAL(clicked()), this, SLOT(displayStream()));
-    connect(ui->displayAllStreamsButton, SIGNAL(clicked()), this, SLOT(displayAllStreams()));
+    connect(ui->displayStreamButton, SIGNAL(clicked()), this, SLOT(getStreamCoordinats()));
+    connect(ui->displayAllStreamsButton, SIGNAL(clicked()), this, SLOT(getStreamCoordinats()));
     connect(ui->refreshButton, SIGNAL(clicked()), this, SLOT(sendRequest()));
     connect(selectionModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(enableButton()));
-    connect(ui->openGisButton, SIGNAL(clicked()), SLOT(runGis()));
+    connect(streamsModel, SIGNAL(rowsInserted(QModelIndex,int,int)), SLOT(enableButton()));
+    connect(ui->selectMapButton, SIGNAL(clicked()), gisClient, SLOT(getMap()));
+    connect(ui->loadMapButton, SIGNAL(clicked()), gisClient, SLOT(loadMap()));
+    connect(gisClient, SIGNAL(error(QString)), SLOT(showMessage(QString)));
+    connect(gisClient, SIGNAL(mapReady(QStringList)), SLOT(showListMaps(QStringList)));
 }
 
 StreamsDialog::~StreamsDialog()
@@ -48,31 +56,55 @@ void StreamsDialog::sendRequest()
     client->sendMessage(QString("%1").arg(GET_STREAMS));
 }
 
-void StreamsDialog::displayStream()
+void StreamsDialog::getStreamCoordinats()
 {
-    if (!selectionModel->hasSelection())
-        return;
+    QString message = QString();
 
-    QSettings settings;
+    // get coordinats stream
+    if (selectionModel->hasSelection() && sender()->objectName().contains("displayStreamButton")) {
+        int curRow = selectionModel->currentIndex().row();
+        message = QString(",%1,%2,%3")
+                .arg(streamsModel->item(curRow, 0)->text())
+                .arg(streamsModel->item(curRow, 1)->text())
+                .arg(streamsModel->item(curRow, 2)->text());
+    }
 
-    //    gisClient->createObject();
-    int curRow = selectionModel->currentIndex().row();
-    client->sendMessage(QString("%1,%2,%3,%4,%5")
-                        .arg(DISPLAY_STREAM)
-                        .arg(streamsModel->item(curRow, 0)->text())
-                        .arg(streamsModel->item(curRow, 1)->text())
-                        .arg(streamsModel->item(curRow, 2)->text())
-                        .arg(settings.value("Gis/pathToMap").toString()));
+    client->sendMessage(QString("%1").arg(DISPLAY_STREAM) + message);
 }
 
-void StreamsDialog::displayAllStreams()
+void StreamsDialog::displayStream(QByteArray &streamCoordinats)
 {
-    QSettings settings;
+    QXmlStreamReader xmlReader(streamCoordinats);
+    int VP;
+    int KP;
+    int NP;
+    QStringList coordinats = QStringList();
 
-    //    gisClient->createObject();
-    client->sendMessage(QString("%1,%2")
-                        .arg(DISPLAY_ALL_STREAMS)
-                        .arg(settings.value("Gis/pathToMap").toString()));
+    do {
+        xmlReader.readNext();
+
+        if (xmlReader.isStartElement()) {
+            if (xmlReader.name() == "VP")
+                VP = xmlReader.readElementText().toInt();
+            else if (xmlReader.name() == "KP")
+                KP = xmlReader.readElementText().toInt();
+            else if (xmlReader.name() == "NP")
+                NP = xmlReader.readElementText().toInt();
+            else if (xmlReader.name() == "coordinats")
+                coordinats << xmlReader.readElementText();
+        }
+        else if (xmlReader.isEndElement())
+            if (xmlReader.name() == "stream") {
+                gisClient->createObject(VP, KP, NP, coordinats);
+
+                coordinats.clear();
+            }
+    } while(!xmlReader.atEnd());
+
+    if (xmlReader.hasError()) {
+        qDebug() << "Parsing XML: " << xmlReader.errorString();
+        return;
+    }
 }
 
 void StreamsDialog::getStreams(QByteArray &streams)
@@ -111,49 +143,22 @@ void StreamsDialog::getStreams(QByteArray &streams)
 
 void StreamsDialog::enableButton()
 {
-    ui->displayStreamButton->setEnabled((process && process->state()) && selectionModel->hasSelection());
-    ui->openGisButton->setEnabled((process && !process->state()) || (!process));
-    ui->displayAllStreamsButton->setEnabled((process && process->state()));
+    ui->displayStreamButton->setEnabled(selectionModel->hasSelection());
+    ui->displayAllStreamsButton->setEnabled(streamsModel->rowCount() > 0);
 }
-
-void StreamsDialog::runGis()
-{
-    if (process && process->state() == QProcess::Running)
-        return;
-
-    QSettings settings;
-    QFileInfo fileInfo(settings.value("Gis/pathToProgram").toString());
-
-    process = new QProcess(this);
-    connect(process, SIGNAL(started()), this, SLOT(connectToGis()));
-    connect(process, SIGNAL(stateChanged(QProcess::ProcessState)), SLOT(enableButton()));
-//    connect(process, SIGNAL(finished(int)), this, SLOT(removeData()));
-
-    QDir::setCurrent(fileInfo.absolutePath());
-    process->start(fileInfo.fileName(), QStringList() << "/P");      // argument P = enable transport data
-//    return process->waitForStarted();
-}
-
-void StreamsDialog::connectToGis()
-{
-    gisClient = new GisClient(this);
-
-    connect(gisClient, SIGNAL(connected()), SLOT(loadMap()));
-    connect(gisClient, SIGNAL(error(QString)), SLOT(showMessage(QString)));
-    connect(gisClient, SIGNAL(error(QString)), process, SLOT(kill()));
-}
-
-void StreamsDialog::loadMap()
-{
-    gisClient->loadMap();
-}
-
-//void StreamsDialog::removeData()
-//{
-//    gisClient->removeData();
-//}
 
 void StreamsDialog::showMessage(const QString &message)
 {
     QMessageBox::warning(this, tr("Error"), message);
+}
+
+void StreamsDialog::showListMaps(const QStringList &maps)
+{
+    bool ok;
+    QString pathToMap = QInputDialog::getItem(this, tr("Select map"), tr("Map:"), maps, 0, false, &ok);
+
+    if (ok && !pathToMap.isEmpty()) {
+        QSettings settings;
+        settings.setValue("GisServer/map", pathToMap);
+    }
 }

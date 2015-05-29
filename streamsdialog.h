@@ -26,19 +26,15 @@ class StreamsDialog : public QDialog
         QItemSelectionModel *selectionModel;
         Client *client;
         GisClient *gisClient;
-        QProcess *process;
 
     private slots:
         void getStreams(QByteArray&);
-        void displayStream();
-        void displayAllStreams();
+        void getStreamCoordinats();
+        void displayStream(QByteArray&);
         void sendRequest();
         void enableButton();
-        void connectToGis();
-        void loadMap();
-        void runGis();
         void showMessage(const QString&);
-//        void removeData();
+        void showListMaps(const QStringList&);
 };
 
 #endif // STREAMSDIALOG_H

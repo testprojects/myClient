@@ -66,8 +66,5 @@ void DialogF2::on_buttonBox_accepted()
 
 void DialogF2::on_lineEdit_VP_Start_textChanged(const QString &arg1)
 {
-    if((arg1.toInt() >= 24) && (arg1.toInt() <= 25))
-        ui->checkBox_KG->setEnabled(true);
-    else
-        ui->checkBox_KG->setDisabled(false);
+    ui->checkBox_KG->setEnabled((arg1.toInt() >= 24) && (arg1.toInt() <= 25));
 }

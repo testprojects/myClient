@@ -5,6 +5,7 @@
 #include <QTextCodec>
 #include <QtCore/QSettings>
 #include <QtCore/QDir>
+#include <QtCore/QThread>
 
 GisClient::GisClient(QObject *parent) : QObject(parent)
 {
@@ -12,9 +13,10 @@ GisClient::GisClient(QObject *parent) : QObject(parent)
     blockSize = 0;
 
     QSettings settings;
-    fileMap = settings.value("Gis/pathToMap").toString();
+    QString ip = settings.value("GisServer/serverIP").toString();
+    int port = settings.value("GisServer/serverPort").toInt();
 
-    tcpSocket->connectToHost(QHostAddress::LocalHost, 1024);
+    tcpSocket->connectToHost(ip, port);
 
     connect(tcpSocket, SIGNAL(connected()), SIGNAL(connected()));
     connect(tcpSocket, SIGNAL(readyRead()), SLOT(printReadData()));
@@ -42,40 +44,40 @@ void GisClient::printError(QAbstractSocket::SocketError error)
 
 void GisClient::printReadData()
 {
-    QDataStream in(tcpSocket);
-//    in.setVersion(QDataStream::Qt_5_3);
+    QByteArray data;
 
-//    while (true) {
-//        if (!blockSize) {
-//            if (tcpSocket->bytesAvailable() < sizeof(quint16)) {
-//                break;
-//            }
-//            in >> blockSize;
-//        }
-//        if (tcpSocket->bytesAvailable() < blockSize) {
-//            break;
-//        }
+    while (!tcpSocket->atEnd()) {
+        data = tcpSocket->readAll();
+    }
 
-        QString str;
-        in >> str;
+    QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
+    QString str = codec->toUnicode(data);
 
-        qDebug() << str;
-
-//        blockSize = 0;
-//    }
+    if (str.contains(".ACT GETMAP__")) {
+        QRegExp regExp("\\[DATA\\]\\s\\.MAP\\s(.*\\.(MAP|SIT|map|sit))");
+        QStringList mapsList = QStringList();
+        int pos = 0;
+        while ((pos = regExp.indexIn(str.simplified(), pos)) != -1) {
+            mapsList << regExp.cap(1);
+            pos += regExp.matchedLength();
+        }
+        mapReady(mapsList);
+    }
 }
 
 void GisClient::loadMap()
 {
+    QSettings settings;
+    QString pathToMap = settings.value("GisServer/map", "").toString();
+
     QStringList command(QStringList()
                         << "[CONTROL]"
                         << ".ACT LOAD____"
-                        << ".MAP " + fileMap
-                        << ".SIT " + QDir::toNativeSeparators(QFileInfo(fileMap).absolutePath()) + "\\test.sit"
+                        << ".MAP " + pathToMap
+                        << ".SIT " + QDir::toNativeSeparators(QFileInfo(pathToMap).absolutePath()) + "\\test.sit"
                         << ".ASK 745"
                         << ".END");
     sendCommand(command.join("\n"));
-    qDebug() << QFileInfo(fileMap).absolutePath();
 }
 
 void GisClient::sendCommand(const QString &command)
@@ -86,29 +88,31 @@ void GisClient::sendCommand(const QString &command)
     block.append(codec->fromUnicode(command));
 
     tcpSocket->write(block);
+    tcpSocket->write("\n");
 }
 
-void GisClient::createObject()
+void GisClient::createObject(int VP, int KP, int NP, const QStringList &coordinatsStream)
 {
+    QSettings settings;
+    QString pathToMap = settings.value("GisServer/map", "").toString();
+
     QStringList command(QStringList()
                         << "[CONTROL]"
                         << ".ACT DATA____"
-                        << ".MAP C:\\Program Files (x86)\\Panorama\\Operator11\\Data\\Cadastre\\88-2.MAP"
-                        << ".SIT C:\\Program Files (x86)\\Panorama\\Operator11\\Data\\Cadastre\\test.SIT"
+                        << ".MAP " + pathToMap
+                        << ".SIT " + QDir::toNativeSeparators(QFileInfo(pathToMap).absolutePath()) + "\\test.sit"
                         << ".ASK 345"
                         << ".REQ 1"
                         << "[DATA]"
                         << ".SIT"
-                        << ".OBJ 0"
-                        << ".KEY L_OBJECT_NEW"
+                        << ".OBJ " + QString("STREAM%1%2%3").arg(VP).arg(KP).arg(NP)
+                        << ".KEY L10000000" + QString::number(VP)
                         << ".SPL POINTS"
                         << ".MET 1"
-                        << "3"
-                        << "5925.28   -4986.85"
-                        << "5925.28   -4675.39"
-                        << "5727.28   -4690.39"
-                        << ".SYS MET42"
+                        << QString("%1").arg(coordinatsStream.size())
+                        << coordinatsStream.join("\n")
                         << ".END");
+
     sendCommand(command.join("\n"));
 }
 
@@ -121,4 +125,10 @@ void GisClient::removeData()
 //                        << ".ASK 255"
 //                        << ".END");
 //    sendCommand(command.join("\n"));
+}
+
+void GisClient::getMap()
+{
+    QStringList command(QStringList() << "[CONTROL]" << ".ACT GETMAP__" << ".ASK 1261" << ".END");
+    sendCommand(command.join("\n"));
 }

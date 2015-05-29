@@ -20,8 +20,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect(ui->saveButton, SIGNAL(clicked()), SLOT(writeSettings()));
     connect(ui->saveButton, SIGNAL(clicked()), SLOT(accept()));
     connect(ui->cancelButton, SIGNAL(clicked()), SLOT(reject()));
-    connect(ui->reviewProgramButton, SIGNAL(clicked()), SLOT(reviewProgram()));
-    connect(ui->reviewMapButton, SIGNAL(clicked()), SLOT(reviewMap()));
 }
 
 SettingsDialog::~SettingsDialog()
@@ -40,12 +38,7 @@ void SettingsDialog::writeSettings()
     settings.endGroup();
 
     if (sender() && sender()->objectName().contains("saveButton")) {
-        settings.beginGroup("Gis");
-        settings.setValue("pathToProgram", ui->pathToProgramLineEdit->text().simplified());
-        settings.setValue("pathToMap", ui->pathToMapLineEdit->text().simplified());
-        settings.endGroup();
-
-        settings.beginGroup("Server");
+        settings.beginGroup("GisServer");
         settings.setValue("serverIP", ui->serverIPLineEdit->text());
         settings.setValue("serverPort", ui->serverPortLineEdit->text());
         settings.endGroup();
@@ -62,35 +55,8 @@ void SettingsDialog::readSettings()
     this->resize(width, height);
     settings.endGroup();
 
-    settings.beginGroup("Gis");
-    ui->pathToProgramLineEdit->setText(QDir::toNativeSeparators(settings.value("pathToProgram", "").toString()));
-    ui->pathToMapLineEdit->setText(QDir::toNativeSeparators(settings.value("pathToMap", "").toString()));
-    settings.endGroup();
-
-    settings.beginGroup("Server");
+    settings.beginGroup("GisServer");
     ui->serverIPLineEdit->setText(settings.value("serverIP").toString());
     ui->serverPortLineEdit->setText(settings.value("serverPort").toString());
     settings.endGroup();
-}
-
-void SettingsDialog::reviewProgram()
-{
-    QString pathToProgram = QFileDialog::getOpenFileName(this, tr("Select Gis program"), (ui->pathToProgramLineEdit->text().isEmpty() ? QDir::homePath() :
-                                                         QFileInfo(ui->pathToProgramLineEdit->text()).absoluteFilePath()), tr("Gis program (*.exe)"));
-
-    if (pathToProgram.isEmpty())
-        return;
-
-    ui->pathToProgramLineEdit->setText(QDir::toNativeSeparators(pathToProgram));
-}
-
-void SettingsDialog::reviewMap()
-{
-    QString pathToMap = QFileDialog::getOpenFileName(this, tr("Select map file"), (ui->pathToMapLineEdit->text().isEmpty() ? QDir::homePath() :
-                                                         QFileInfo(ui->pathToMapLineEdit->text()).absoluteFilePath()), tr("Map file (*.map)"));
-
-    if (pathToMap.isEmpty())
-        return;
-
-    ui->pathToMapLineEdit->setText(QDir::toNativeSeparators(pathToMap));
 }

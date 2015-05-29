@@ -22,8 +22,6 @@ class SettingsDialog : public QDialog
 
     private slots:
         void writeSettings();
-        void reviewProgram();
-        void reviewMap();
 };
 
 #endif // SETTINGSDIALOG_H
