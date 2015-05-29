@@ -70,7 +70,7 @@
      <x>0</x>
      <y>0</y>
      <width>417</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -344,26 +344,41 @@
    </property>
   </action>
   <action name="action_7">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>для ЕС ЭВМ</string>
    </property>
   </action>
   <action name="action_11">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>для ПК</string>
    </property>
   </action>
   <action name="action_17">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>для ЕС ЭВМ</string>
    </property>
   </action>
   <action name="action">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>для ПК</string>
    </property>
   </action>
   <action name="action_5">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>для ЕС ЭВМ</string>
    </property>
