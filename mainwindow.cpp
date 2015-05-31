@@ -366,20 +366,6 @@ void MainWindow::on_actionCacheOut_triggered()
 
 void MainWindow::on_actionDisplayStreams_triggered()
 {
-    QSettings settings;
-    settings.beginGroup("Gis");
-    QString pathProgramm = settings.value("pathToProgram").toString();
-    QString pathMap = settings.value("pathToMap").toString();
-    settings.endGroup();
-
-    if(pathProgramm.isEmpty()) {
-        QMessageBox::warning(this, "ГИС", "Укажите путь к исполняемому файлу ГИС в настройках");
-        return;
-    }
-    if(pathMap.isEmpty()) {
-        QMessageBox::warning(this, "ГИС", "Укажите путь к стандартной карте ГИС в настройках");
-        return;
-    }
     StreamsDialog streamsDialog(this, m_client);
     streamsDialog.exec();
 }

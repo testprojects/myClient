@@ -54,10 +54,10 @@ void GisClient::printReadData()
     QString str = codec->toUnicode(data);
 
     if (str.contains(".ACT GETMAP__")) {
-        QRegExp regExp("\\[DATA\\]\\s\\.MAP\\s(.*\\.(MAP|SIT|map|sit))");
+        QRegExp regExp("\\n\\.MAP\\s([^\\n]*\\.(MAP|map))");
         QStringList mapsList = QStringList();
         int pos = 0;
-        while ((pos = regExp.indexIn(str.simplified(), pos)) != -1) {
+        while ((pos = regExp.indexIn(str, pos)) != -1) {
             mapsList << regExp.cap(1);
             pos += regExp.matchedLength();
         }
